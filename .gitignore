@@ -26,3 +26,8 @@
 *.exe
 *.out
 *.app
+
+.cproject
+.project
+include/thrift
+src/thrift
