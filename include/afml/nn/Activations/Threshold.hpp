@@ -31,8 +31,8 @@ namespace afml
             }
         public:
             ThresholdNode(int size, double val, const char *name="none") :
-                mVal(val),
-                ActivationNode(size, name)
+                ActivationNode(size, name),
+                mVal(val)
             {
             }
         };

@@ -30,8 +30,8 @@ namespace afml
             void set(const int *inputSizes, const int *outputSizes,
                      const char *name, const int count)
             {
-                for (int i = 0; i <  mInputSizes.size(); i++)  mInputSizes[i] =  inputSizes[i];
-                for (int i = 0; i < mOutputSizes.size(); i++) mOutputSizes[i] = outputSizes[i];
+                for (int i = 0; i <  (int)mInputSizes.size(); i++)  mInputSizes[i] =  inputSizes[i];
+                for (int i = 0; i < (int)mOutputSizes.size(); i++) mOutputSizes[i] = outputSizes[i];
 
                 int len = std::min(count, MAX_NAME_SIZE - 1);
                 std::memcpy(mName, name, len);
@@ -55,9 +55,16 @@ namespace afml
                 set(&inputSizes[0], &outputSizes[0], name.c_str(), (int)name.size());
             }
 
-            virtual ArrayVector forward(const ArrayVector &input) {}
+            virtual ArrayVector forward(const ArrayVector &input)
+            {
+                return input;
+            }
+
             virtual ArrayVector backward(const ArrayVector &input,
-                                         const ArrayVector &gradOutput) {}
+                                         const ArrayVector &gradOutput)
+            {
+                return gradOutput;
+            }
 
             virtual void normalize(double val) {}
             virtual void update(double lr) {}
@@ -68,12 +75,12 @@ namespace afml
                 std::cout << "Name: "  << mName << std::endl;
                 std::cout << "Input sizes: " << std::endl;
 
-                for (int i = 0; i < mInputSizes.size(); i++) {
+                for (int i = 0; i <  (int)mInputSizes.size(); i++) {
                     std::cout << mInputSizes[i] << std::endl;
                 }
 
                 std::cout << "Output sizes: " << std::endl;
-                for (int i = 0; i < mOutputSizes.size(); i++) {
+                for (int i = 0; i < (int)mOutputSizes.size(); i++) {
                     std::cout << mOutputSizes[i] << std::endl;
                 }
             }

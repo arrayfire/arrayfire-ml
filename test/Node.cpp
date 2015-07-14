@@ -7,7 +7,7 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <afml/nn/Node.hpp>
+#include <afml/nn/Nodes/Node.hpp>
 
 using namespace afml::nn;
 
