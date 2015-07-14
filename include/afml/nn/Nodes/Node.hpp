@@ -60,7 +60,7 @@ namespace afml
                                          const ArrayVector &gradOutput) {}
 
             virtual void normalize(double val) {}
-            virtual void update() {}
+            virtual void update(double lr) {}
 
             //TODO: Add a method that actually returns this information to the user
             virtual void info()

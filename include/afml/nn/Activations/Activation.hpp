@@ -9,7 +9,7 @@
 #pragma once
 
 #include <afml/util/common.hpp>
-#include <afml/nn/Node.hpp>
+#include <afml/nn/Nodes/Node.hpp>
 
 namespace afml
 {

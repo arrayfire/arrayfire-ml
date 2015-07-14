@@ -10,6 +10,6 @@
 #pragma once
 
 #include <afml/util/common.hpp>
-#include <afml/nn/Node.hpp>
+#include <afml/nn/Nodes.hpp>
 #include <afml/nn/Weights.hpp>
 #include <afml/nn/Activations.hpp>
