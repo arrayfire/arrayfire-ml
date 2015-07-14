@@ -11,3 +11,4 @@
 
 #include <afml/util/common.hpp>
 #include <afml/nn/Node.hpp>
+#include <afml/nn/Weights.hpp>
