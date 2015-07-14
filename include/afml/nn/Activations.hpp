@@ -6,10 +6,10 @@
  * The complete license agreement can be obtained at:
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
-
 #pragma once
 
-#include <afml/util/common.hpp>
-#include <afml/nn/Node.hpp>
-#include <afml/nn/Weights.hpp>
-#include <afml/nn/Activations.hpp>
+#include <afml/nn/Activations/Activation.hpp>
+#include <afml/nn/Activations/Sigmoid.hpp>
+#include <afml/nn/Activations/Tanh.hpp>
+#include <afml/nn/Activations/Threshold.hpp>
+#include <afml/nn/Activations/ReLU.hpp>
