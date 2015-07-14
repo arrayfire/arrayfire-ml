@@ -23,7 +23,7 @@ namespace afml
             Weights(int inputSize, int outputSize, double spread = 0.0) : mData(2)
             {
                 mData[0] = af::randu(outputSize, inputSize) * spread * 2 - spread; //Weights
-                mData[1] = af::randu(outputSize,         1) * spread * 2 - spread; //Biases
+                mData[1] = af::constant(0, outputSize,         1); //Biases
             }
 
             Weights(const af::array &weights, const af::array &bias) : mData(2)
@@ -71,7 +71,18 @@ namespace afml
                 mData[0] = af::constant(0, mData[0].dims());
                 mData[1] = af::constant(0, mData[1].dims());
             }
+
+            void eval()
+            {
+                mData[0].eval();
+                mData[1].eval();
+            }
         };
+
+        Weights operator*(const double val, const Weights W)
+        {
+            return Weights(val * W.getWeights(), val * W.getBias());
+        }
 
     }
 }
