@@ -43,15 +43,11 @@ namespace afml
             ArrayVector backward(const ArrayVector &input,
                                  const ArrayVector &gradOutput)
             {
-                mDiffs.setWeights(af::matmulNT(gradOutput[0], input[0]));
-                mDiffs.setBias(af::sum(gradOutput[0], 1));
+                double m = input[0].dims(1);
+                mDiffs.setWeights(af::matmulNT(gradOutput[0], input[0]) / m);
+                mDiffs.setBias(af::sum(gradOutput[0], 1) / m);
 
                 return { af::matmulTN(mWeights.getWeights(), gradOutput[0]) };
-            }
-
-            void normalize(double val)
-            {
-                mDiffs /= val;
             }
 
             void update(double lr)

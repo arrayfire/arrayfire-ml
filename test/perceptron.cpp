@@ -51,7 +51,6 @@ int main()
 
         for (int n = 1; n >= 0; n--) {
             data = perceptron[n]->backward(inputs[n], data);
-            perceptron[n]->normalize(numSamples);
             perceptron[n]->update(lr);
         }
     }

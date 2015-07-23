@@ -66,7 +66,6 @@ namespace afml
                 return gradOutput;
             }
 
-            virtual void normalize(double val) {}
             virtual void update(double lr) {}
 
             //TODO: Add a method that actually returns this information to the user
