@@ -30,7 +30,7 @@ namespace afml
                        const char *name="none") :
                 Node(1, &inputSize, 1, &outputSize, name),
                 mWeights(inputSize, outputSize, spread),
-                mDiffs(inputSize, outputSize)
+                mDiffs()
             {
             }
 

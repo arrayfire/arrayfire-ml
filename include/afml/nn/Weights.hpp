@@ -20,10 +20,15 @@ namespace afml
 
         public:
 
-            Weights(int inputSize, int outputSize, double spread = 0.0) : mData(2)
+            Weights() : mData(2)
             {
-                mData[0] = af::randu(outputSize, inputSize) * spread * 2 - spread; //Weights
-                mData[1] = af::constant(0, outputSize,         1); //Biases
+            }
+
+
+            Weights(int inputSize, int outputSize, double spread) : mData(2)
+            {
+                mData[0] = af::randu(outputSize, inputSize) * spread - spread / 2; //Weights
+                mData[1] = af::randu(outputSize,         1) * spread - spread / 2; //Biases
             }
 
             Weights(const af::array &weights, const af::array &bias) : mData(2)
