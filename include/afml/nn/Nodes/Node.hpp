@@ -38,6 +38,21 @@ namespace afml
                 mName[len] = 0;
             }
 
+        protected:
+            void setOutSizes(const int numOutputs, const int *outputSizes)
+            {
+                mOutputSizes.resize(numOutputs);
+                for (int i = 0; i < numOutputs; i++) {
+                    mOutputSizes[i] = outputSizes[i];
+                }
+            }
+
+            Node(const int numInputs, const int *inputSizes, const char *name):
+                mInputSizes(numInputs), mOutputSizes(numInputs)
+            {
+                set(inputSizes, inputSizes, name, (int)strlen(name));
+            }
+
         public:
 
             Node(const int numInputs, const int *inputSizes,
@@ -82,6 +97,16 @@ namespace afml
                 for (int i = 0; i < (int)mOutputSizes.size(); i++) {
                     std::cout << mOutputSizes[i] << std::endl;
                 }
+            }
+
+            IntVector getInSizes() const
+            {
+                return mInputSizes;
+            }
+
+            IntVector getOutSizes() const
+            {
+                return mOutputSizes;
             }
         };
 
