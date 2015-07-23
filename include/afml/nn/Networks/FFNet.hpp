@@ -24,6 +24,18 @@ namespace afml
             std::vector<NodePtr> mNodes;
             std::vector<ArrayVector> mData;
 
+            template<typename NodeType>
+            FeedForwardNetwork& addNodePtr(NodeType *nodePtr)
+            {
+                mNodes.emplace_back(nodePtr);
+
+                // TODO: Throw exception of node.getOutSizes() has >1 length
+                int size = nodePtr->getOutSizes()[0];
+                mNodeSizes.push_back(size);
+                this->setOutSizes(1, &size);
+                return *this;
+            }
+
         public:
 
             FeedForwardNetwork(const int inputSize, const char *name="none") :
@@ -35,15 +47,16 @@ namespace afml
                 mNodeSizes[0] = inputSize;
             }
 
+            template<typename NodeType>
+            FeedForwardNetwork& addNode(const NodeType &node)
+            {
+                return addNodePtr(new NodeType(node));
+            }
+
+
             FeedForwardNetwork& addLinearNode(const int size, const double spread = 0.05)
             {
-                int num = (int)mNodeSizes.size();
-
-                mNodes.emplace_back(new LinearNode(mNodeSizes[num - 1], size, spread));
-                mNodeSizes.push_back(size);
-
-                this->setOutSizes(1, &size);
-                return *this;
+                return addNodePtr(new LinearNode(mNodeSizes.back(), size, spread));
             }
 
             template<typename ActivationType = SigmoidNode>
@@ -53,21 +66,8 @@ namespace afml
 
                 // Ensure ActivationType is derived from ActivationNode
                 ActivationNode *node = new ActivationType(size);
-                mNodeSizes.push_back(size);
-                mNodes.emplace_back(node);
-                return *this;
-            }
 
-            template<typename NodeType>
-            FeedForwardNetwork& addNode(const NodeType &node)
-            {
-                mNodes.emplace_back(new NodeType(node));
-
-                // TODO: Throw exception of node.getOutSizes() has >1 length
-                int size = node.getOutSizes()[0];
-
-                mNodeSizes.push_back(size);
-                return *this;
+                return addNodePtr(node);
             }
 
             ArrayVector forward(const ArrayVector &input)
