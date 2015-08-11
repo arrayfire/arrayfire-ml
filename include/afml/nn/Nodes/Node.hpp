@@ -81,7 +81,7 @@ namespace afml
                 return gradOutput;
             }
 
-            virtual void update(double lr) {}
+            virtual void update(float lr) {}
 
             //TODO: Add a method that actually returns this information to the user
             virtual void info()

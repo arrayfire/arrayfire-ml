@@ -26,7 +26,7 @@ namespace afml
         public:
 
             LinearNode(const int inputSize, const int outputSize,
-                       double spread = 0.05,
+                       float spread = 0.05,
                        const char *name="none") :
                 Node(1, &inputSize, 1, &outputSize, name),
                 mWeights(inputSize, outputSize, spread),
@@ -43,14 +43,14 @@ namespace afml
             ArrayVector backward(const ArrayVector &input,
                                  const ArrayVector &gradOutput)
             {
-                double m = input[0].dims(1);
+                float m = input[0].dims(1);
                 mDiffs.setWeights(af::matmulNT(gradOutput[0], input[0]) / m);
                 mDiffs.setBias(af::sum(gradOutput[0], 1) / m);
 
                 return { af::matmulTN(mWeights.getWeights(), gradOutput[0]) };
             }
 
-            void update(double lr)
+            void update(float lr)
             {
                 mWeights += lr * mDiffs;
                 mWeights.eval();

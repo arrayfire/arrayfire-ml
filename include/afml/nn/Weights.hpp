@@ -25,7 +25,7 @@ namespace afml
             }
 
 
-            Weights(int inputSize, int outputSize, double spread) : mData(2)
+            Weights(int inputSize, int outputSize, float spread) : mData(2)
             {
                 mData[0] = af::randu(outputSize, inputSize) * spread - spread / 2; //Weights
                 mData[1] = af::randu(outputSize,         1) * spread - spread / 2; //Biases
@@ -64,7 +64,7 @@ namespace afml
                 return *this;
             }
 
-            Weights operator/=(double val)
+            Weights operator/=(float val)
             {
                 mData[0] /= val;
                 mData[1] /= val;
@@ -84,7 +84,7 @@ namespace afml
             }
         };
 
-        Weights operator*(const double val, const Weights W)
+        Weights operator*(const float val, const Weights W)
         {
             return Weights(val * W.getWeights(), val * W.getBias());
         }

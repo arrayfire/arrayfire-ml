@@ -54,7 +54,7 @@ namespace afml
             }
 
 
-            FeedForwardNetwork& addLinearNode(const int size, const double spread = 0.05)
+            FeedForwardNetwork& addLinearNode(const int size, const float spread = 0.05)
             {
                 return addNodePtr(new LinearNode(mNodeSizes.back(), size, spread));
             }
@@ -91,7 +91,7 @@ namespace afml
                 return currGradOutput;
             }
 
-            void update(double lr)
+            void update(float lr)
             {
                 for(int i = 0; i < (int)mNodes.size(); i++) {
                     mNodes[i]->update(lr);
