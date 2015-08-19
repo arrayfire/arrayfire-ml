@@ -20,8 +20,8 @@ namespace afml
         {
         private:
 
-            Weights mWeights;
-            Weights mDiffs;
+            Weights mWeight, mBias;
+            Weights mWeightDiff, mBiasDiff;
 
         public:
 
@@ -29,32 +29,39 @@ namespace afml
                        float spread = 0.05,
                        const char *name="none") :
                 Node(1, &inputSize, 1, &outputSize, name),
-                mWeights(inputSize, outputSize, spread),
-                mDiffs()
+                mWeight(inputSize, outputSize, spread),
+                mBias(1, outputSize, spread),
+                mWeightDiff(), mBiasDiff()
             {
             }
 
             ArrayVector forward(const ArrayVector &input)
             {
-                return {af::matmul(mWeights.getWeights(), input[0]) +
-                        af::tile(mWeights.getBias(), 1, input[0].dims(1))};
+                return {af::matmul(mWeight, input[0]) +
+                        af::tile(mBias, 1, input[0].dims(1))};
             }
 
             ArrayVector backward(const ArrayVector &input,
                                  const ArrayVector &gradOutput)
             {
                 float m = input[0].dims(1);
-                mDiffs.setWeights(af::matmulNT(gradOutput[0], input[0]) / m);
-                mDiffs.setBias(af::sum(gradOutput[0], 1) / m);
 
-                return { af::matmulTN(mWeights.getWeights(), gradOutput[0]) };
+                mWeightDiff = af::matmulNT(gradOutput[0], input[0]) / m;
+                mBiasDiff = af::sum(gradOutput[0], 1) / m;
+
+                return { af::matmulTN(mWeight, gradOutput[0]) };
             }
 
             void update(float lr)
             {
-                mWeights += lr * mDiffs;
-                mWeights.eval();
-                mDiffs.reset();
+                mWeight += lr * mWeightDiff;
+                mBias   += lr * mBiasDiff;
+
+                mWeight.eval();
+                mBias.eval();
+
+                mWeightDiff.reset();
+                mBiasDiff.reset();
             }
         };
     }

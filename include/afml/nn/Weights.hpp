@@ -20,74 +20,127 @@ namespace afml
 
         public:
 
-            Weights() : mData(2)
+            Weights() : mData(1)
             {
             }
 
 
-            Weights(int inputSize, int outputSize, float spread) : mData(2)
+            Weights(int inputSize, int outputSize, float spread) : mData(1)
             {
                 mData[0] = af::randu(outputSize, inputSize) * spread - spread / 2; //Weights
-                mData[1] = af::randu(outputSize,         1) * spread - spread / 2; //Biases
             }
 
-            Weights(const af::array &weights, const af::array &bias) : mData(2)
+            Weights(const af::array &weights) : mData(1)
             {
                 mData[0] = weights;
-                mData[1] = bias;
             }
 
-            af::array getWeights() const
+            operator af::array() const
             {
                 return mData[0];
             }
 
-            af::array getBias() const
+            Weights operator+(const Weights &other) const
             {
-                return mData[1];
+                return mData[0] + other;
             }
 
-            void setWeights(const af::array &weights)
+            Weights operator*(const Weights &other) const
             {
-                mData[0] = weights;
+                return mData[0] * other;
             }
 
-            void setBias(const af::array &bias)
+            Weights operator/(const Weights &other) const
             {
-                mData[1] = bias;
+                return mData[0] / other;
+            }
+
+            Weights operator-(const Weights &other) const
+            {
+                return mData[0] - other;
             }
 
             Weights operator+=(const Weights &other)
             {
-                mData[0] += other.getWeights();
-                mData[1] += other.getBias();
+                mData[0] += other;
                 return *this;
             }
 
             Weights operator/=(float val)
             {
                 mData[0] /= val;
-                mData[1] /= val;
+                return *this;
+            }
+
+            Weights operator*=(const Weights &other)
+            {
+                mData[0] *= other;
+                return *this;
+            }
+
+            Weights operator-=(float val)
+            {
+                mData[0] -= val;
                 return *this;
             }
 
             void reset()
             {
                 mData[0] = af::constant(0, mData[0].dims());
-                mData[1] = af::constant(0, mData[1].dims());
             }
 
             void eval()
             {
                 mData[0].eval();
-                mData[1].eval();
             }
         };
 
-        Weights operator*(const float val, const Weights W)
+        Weights operator *(const Weights &lhs, const double &rhs)
         {
-            return Weights(val * W.getWeights(), val * W.getBias());
+            const af::array lhs_arr = lhs;
+            return lhs_arr * rhs;
         }
 
+        Weights operator +(const Weights &lhs, const double &rhs)
+        {
+            const af::array lhs_arr = lhs;
+            return lhs_arr + rhs;
+        }
+
+        Weights operator /(const Weights &lhs, const double &rhs)
+        {
+            const af::array lhs_arr = lhs;
+            return lhs_arr / rhs;
+        }
+
+        Weights operator -(const Weights &lhs, const double &rhs)
+        {
+            const af::array lhs_arr = lhs;
+            return lhs_arr - rhs;
+        }
+
+        Weights operator *(const double &lhs, const Weights &rhs)
+        {
+            const af::array rhs_arr = rhs;
+            return lhs * rhs_arr;
+        }
+
+        Weights operator +(const double &lhs, const Weights &rhs)
+        {
+            const af::array rhs_arr = rhs;
+            return lhs + rhs_arr;
+        }
+
+        Weights operator /(const double &lhs, const Weights &rhs)
+        {
+            const af::array rhs_arr = rhs;
+            return lhs / rhs_arr;
+        }
+
+        Weights operator -(const double &lhs, const Weights &rhs)
+        {
+            const af::array rhs_arr = rhs;
+            return lhs - rhs_arr;
+        }
     }
 }

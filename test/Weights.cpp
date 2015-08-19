@@ -14,7 +14,7 @@ using namespace afml::nn;
 int main()
 {
     Weights w(10, 1, 0.05);
+    af_print(w);
 
-    af_print(w.getWeights());
-    af_print(w.getBias());
+    return 0;
 }
