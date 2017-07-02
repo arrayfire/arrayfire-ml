@@ -15,6 +15,7 @@ using namespace afml::nn;
 
 int main()
 {
+    af::info();
     const int inputSize  = 2;
     const int hiddenSize = 3;
     const int outputSize = 1;
