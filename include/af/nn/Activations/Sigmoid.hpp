@@ -8,9 +8,9 @@
  ********************************************************/
 #pragma once
 
-#include <afml/nn/Activations/Activation.hpp>
+#include <af/nn/Activations/Activation.hpp>
 
-namespace afml
+namespace af
 {
     namespace nn
     {

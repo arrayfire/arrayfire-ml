@@ -8,9 +8,9 @@
  ********************************************************/
 #pragma once
 
-#include <afml/util/common.hpp>
+#include <af/nn/common.hpp>
 
-namespace afml
+namespace af
 {
     namespace nn
     {

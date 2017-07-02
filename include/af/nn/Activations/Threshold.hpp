@@ -8,33 +8,35 @@
  ********************************************************/
 #pragma once
 
-#include <afml/nn/Activations/Activation.hpp>
+#include <af/nn/Activations/Activation.hpp>
 
-namespace afml
+namespace af
 {
     namespace nn
     {
-        class TanhNode : public ActivationNode
+        class ThresholdNode : public ActivationNode
         {
         private:
+            float mVal;
 
             af::array fn(const af::array &input)
             {
-                return af::tanh(input);
+                af::array cond = (input >= mVal);
+                return (cond) * input + (1 - cond) * mVal;
             }
 
             af::array dfn(const af::array &input)
             {
-                af::array output = fn(input);
-                return (1 - output * output);
+                return (input >= mVal).as(input.type());
             }
         public:
-            TanhNode(int size, const char *name="none") :
-                ActivationNode(size, name)
+            ThresholdNode(int size, float val, const char *name="none") :
+                ActivationNode(size, name),
+                mVal(val)
             {
             }
         };
 
-        typedef TanhNode Tanh;
+        typedef ThresholdNode Threshold;
     }
 }

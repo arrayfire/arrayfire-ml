@@ -8,8 +8,13 @@
  ********************************************************/
 #pragma once
 
-#include <afml/nn/Activations/Activation.hpp>
-#include <afml/nn/Activations/Sigmoid.hpp>
-#include <afml/nn/Activations/Tanh.hpp>
-#include <afml/nn/Activations/Threshold.hpp>
-#include <afml/nn/Activations/ReLU.hpp>
+#include <af/nn/Activations/Activation.hpp>
+#include <af/nn/Activations/Threshold.hpp>
+
+namespace af
+{
+    namespace nn
+    {
+        typedef ThresholdNode ReLU;
+    }
+}

@@ -7,10 +7,10 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <afml/nn.h>
+#include <af/nn.h>
 
-using namespace afml;
-using namespace afml::nn;
+using namespace af;
+using namespace af::nn;
 
 int main()
 {
