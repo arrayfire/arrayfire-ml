@@ -7,16 +7,16 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <afml/nn/Activations.hpp>
+#include <af/nn/Activations.hpp>
 
-using namespace afml::nn;
+using namespace af::nn;
 
 int main()
 {
     const int num = 5;
 
-    afml::ArrayVector in = {100 * af::randu(num, 1) - 50};
-    afml::ArrayVector grad = {100 * af::randu(num, 1)};
+    af::ArrayVector in = {100 * af::randu(num, 1) - 50};
+    af::ArrayVector grad = {100 * af::randu(num, 1)};
 
     ReLU    r = ReLU(num, 0);
     Sigmoid s = Sigmoid(num);

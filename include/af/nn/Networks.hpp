@@ -6,6 +6,6 @@
  * The complete license agreement can be obtained at:
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
-
 #pragma once
-#include <afml/nn.h>
+
+#include <af/nn/Networks/FFNet.hpp>

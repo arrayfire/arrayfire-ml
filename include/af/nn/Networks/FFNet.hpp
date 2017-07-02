@@ -8,12 +8,12 @@
  ********************************************************/
 #pragma once
 
-#include <afml/util/common.hpp>
-#include <afml/nn/Weights.hpp>
-#include <afml/nn/Nodes/Linear.hpp>
-#include <afml/nn/Activations.hpp>
+#include <af/nn/common.hpp>
+#include <af/nn/Weights.hpp>
+#include <af/nn/Nodes/Linear.hpp>
+#include <af/nn/Activations.hpp>
 
-namespace afml
+namespace af
 {
     namespace nn
     {

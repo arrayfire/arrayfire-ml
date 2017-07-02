@@ -8,13 +8,5 @@
  ********************************************************/
 #pragma once
 
-#include <arrayfire.h>
-#include <vector>
-
-namespace afml
-{
-    const int MAX_NAME_SIZE = 32;
-
-    typedef std::vector<int> IntVector;
-    typedef std::vector<af::array> ArrayVector;
-}
+#include <af/nn/Nodes/Node.hpp>
+#include <af/nn/Nodes/Linear.hpp>

@@ -8,13 +8,13 @@
  ********************************************************/
 #pragma once
 
-#include <afml/util/common.hpp>
-#include <afml/nn/Weights.hpp>
+#include <af/nn/common.hpp>
+#include <af/nn/Weights.hpp>
 
 #include <memory>
 #include <cstring>
 
-namespace afml
+namespace af
 {
     namespace nn
     {

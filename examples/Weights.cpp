@@ -7,9 +7,9 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <afml/nn/Weights.hpp>
+#include <af/nn/Weights.hpp>
 
-using namespace afml::nn;
+using namespace af::nn;
 
 int main()
 {

@@ -8,4 +8,13 @@
  ********************************************************/
 #pragma once
 
-#include <afml/nn/Networks/FFNet.hpp>
+#include <arrayfire.h>
+#include <vector>
+
+namespace af
+{
+    const int MAX_NAME_SIZE = 32;
+
+    typedef std::vector<int> IntVector;
+    typedef std::vector<af::array> ArrayVector;
+}
