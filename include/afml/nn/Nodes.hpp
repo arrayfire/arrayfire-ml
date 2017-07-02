@@ -10,3 +10,4 @@
 
 #include <afml/nn/Nodes/Node.hpp>
 #include <afml/nn/Nodes/Linear.hpp>
+#include <afml/nn/Nodes/LSTM.hpp>
