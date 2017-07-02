@@ -19,7 +19,7 @@ void test1()
     af_print(y.getData());
     auto dy = Variable(af::constant(1.0, 5));
     backward(y, dy);
-    af_print(x.getGrad() - 2 * x.getData());
+    af_print(x.getGrad().getData() - 2 * x.getData());
 }
 
 void test2()
@@ -31,8 +31,8 @@ void test2()
     auto z = x * x + x * y + y * y;
     auto dz = Variable(af::constant(1.0, 5));
     backward(z, dz);
-    af_print(x.getGrad() - 2 * x.getData() - y.getData());
-    af_print(y.getGrad() - 2 * y.getData() - x.getData());
+    af_print(x.getGrad().getData() - 2 * x.getData() - y.getData());
+    af_print(y.getGrad().getData() - 2 * y.getData() - x.getData());
 }
 
 int main()

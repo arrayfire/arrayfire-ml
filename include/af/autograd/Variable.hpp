@@ -14,11 +14,17 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <stdexcept>
 
 #include <arrayfire.h>
 
 namespace af {
     namespace autograd {
+
+        // Forward declare the function
+        class Variable;
+        Variable operator +(const Variable lhs, const Variable rhs);
+
         class Variable
         {
         public:
@@ -31,25 +37,22 @@ namespace af {
             public:
                 Shared() :
                     m_data(),
-                    m_grad(),
                     m_inputs(),
-                    m_grad_parts(),
+                    m_grads(),
                     m_backward(nullptr)
                 {}
 
                 Shared(af::array data) :
                     m_data(data),
-                    m_grad(af::constant(0, data.dims(), data.type())),
                     m_inputs(),
-                    m_grad_parts(),
+                    m_grads(),
                     m_backward(nullptr)
                 {}
 
                 Shared(af::array data, std::vector<Variable> inputs, BackwardFunc_t backward) :
                     m_data(data),
-                    m_grad(af::constant(0, data.dims(), data.type())),
                     m_inputs(inputs.begin(), inputs.end()),
-                    m_grad_parts(),
+                    m_grads(),
                     m_backward(backward)
                 {}
 
@@ -58,19 +61,17 @@ namespace af {
                     return m_data;
                 }
 
-                af::array getGrad() const
+                Variable getGrad() const
                 {
-                    return m_grad;
+                    if (m_grads.size() == 0) {
+                        throw std::runtime_error("Gradient hasn't been calculated");
+                    }
+                    return m_grads[0];
                 }
 
                 void addGrad(Variable grad)
                 {
-                    m_grad_parts.push_back(grad);
-                }
-
-                std::vector<Variable> getGradParts()
-                {
-                    return m_grad_parts;
+                    m_grads.push_back(grad);
                 }
 
                 std::vector<Variable> getInputs()
@@ -80,24 +81,26 @@ namespace af {
 
                 void evalGrad()
                 {
-                    m_grad = m_grad_parts[0].getData();
-                    for (int i = 1; i < (int)m_grad_parts.size(); i++) {
-                        m_grad += m_grad_parts[i].getData();
+                    if (m_grads.size() == 1) return;
+                    Variable grad = m_grads[0];
+                    for (int i = 1; i < (int)m_grads.size(); i++) {
+                        grad = grad + m_grads[i];
                     }
-                    af::eval(m_grad);
+                    grad.getData().eval();
+                    m_grads.clear();
+                    m_grads.push_back(grad);
                 }
 
                 void backward()
                 {
                     this->evalGrad();
-                    if (m_backward) m_backward(m_inputs, m_grad);
+                    if (m_backward) m_backward(m_inputs, m_grads[0]);
                 }
 
             private:
                 af::array m_data;
-                af::array m_grad;
                 std::vector<Variable> m_inputs;
-                std::vector<Variable> m_grad_parts;
+                std::vector<Variable> m_grads;
                 BackwardFunc_t m_backward;
             };
 
@@ -123,7 +126,7 @@ namespace af {
                 return m_shared->getData();
             }
 
-            af::array getGrad() const
+            Variable getGrad() const
             {
                 return m_shared->getGrad();
             }
