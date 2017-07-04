@@ -18,7 +18,7 @@ namespace af {
             var.addGrad(grad);
             Variable::DAG_t dag = var.build();
             for (auto iter = dag.rbegin(); iter != dag.rend(); iter++) {
-                iter->backward();
+                iter->calcGradInputs();
             }
         }
     }
