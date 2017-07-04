@@ -10,7 +10,6 @@
 #include <af/nn.h>
 
 using namespace af;
-using namespace af;
 using namespace af::nn;
 
 int main()

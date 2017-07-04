@@ -15,22 +15,22 @@ namespace af {
 
         Variable operator +(const Variable lhs, const Variable rhs)
         {
-            auto result = lhs.getData() + rhs.getData();
-            auto backward = [](std::vector<Variable> inputs, Variable grad_output) {
+            auto result = lhs.array() + rhs.array();
+            auto grad_func = [](std::vector<Variable> inputs, Variable grad_output) {
                 inputs[0].addGrad(grad_output);
                 inputs[1].addGrad(grad_output);
             };
-            return Variable(result, {lhs, rhs}, backward);
+            return Variable(result, {lhs, rhs}, grad_func);
         }
 
         Variable operator *(const Variable lhs, const Variable rhs)
         {
-            auto result = lhs.getData() * rhs.getData();
-            auto backward = [](std::vector<Variable> inputs, Variable grad_output) {
+            auto result = lhs.array() * rhs.array();
+            auto grad_func = [](std::vector<Variable> inputs, Variable grad_output) {
                 inputs[0].addGrad(grad_output * inputs[1]);
                 inputs[1].addGrad(grad_output * inputs[0]);
             };
-            return Variable(result, {lhs, rhs}, backward);
+            return Variable(result, {lhs, rhs}, grad_func);
         }
 
     }
