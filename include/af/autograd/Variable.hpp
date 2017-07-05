@@ -60,16 +60,15 @@ namespace af {
 
             void addGrad(const Variable &child_grad);
 
-            void evalGrad();
+            void calcGradInputs(bool retain_grad_graph = false);
 
-            void calcGradInputs();
-
-            void backward(const Variable &grad);
-
-            DAG_t build();
+            void backward(const Variable &grad, bool retain_grad_graph = false);
 
             void buildSubGraph(Cache_t &cache, DAG_t &dag);
         private:
+            void evalGrad(bool retain_grad_graph = false);
+
+            DAG_t build();
             std::shared_ptr<Shared> m_shared;
         };
     }

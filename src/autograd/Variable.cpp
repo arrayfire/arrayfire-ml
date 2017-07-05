@@ -103,24 +103,33 @@ namespace af {
             }
         }
 
-        void Variable::evalGrad()
+        void Variable::evalGrad(bool retain_grad_graph)
         {
             // Flag asking not to calculate gradients
             if (!m_shared->m_calc_grad) return;
 
             // Best not to evaluate the JIT immediately if theres only a single gradient
+            Variable grad = m_shared->m_grads[0];
             if (m_shared->m_grads.size() > 1) {
-                Variable grad = m_shared->m_grads[0];
                 for (unsigned i = 1; i < m_shared->m_grads.size(); i++) {
                     grad = grad + m_shared->m_grads[i];
                 }
                 grad.array().eval();
-                m_shared->m_grads.clear();
-                m_shared->m_grads.push_back(grad);
+                m_shared->m_grads.resize(1);
             }
+
+            // Remove the graph if not needed
+            if (!retain_grad_graph) {
+                // This can be done by extracting af::array and ignoring everything else
+                auto grad_data = grad.array();
+                // Since there's no graph leading this, set calc_grad to false
+                grad = Variable(grad_data, false);
+            }
+
+            m_shared->m_grads[0] = grad;
         }
 
-        void Variable::calcGradInputs()
+        void Variable::calcGradInputs(bool retain_grad_graph)
         {
             evalGrad();
             if (m_shared->m_grad_func) {
@@ -128,12 +137,12 @@ namespace af {
             }
         }
 
-        void Variable::backward(const Variable &grad)
+        void Variable::backward(const Variable &grad, bool retain_grad_graph)
         {
             this->addGrad(grad);
             Variable::DAG_t dag = this->build();
             for (auto iter = dag.rbegin(); iter != dag.rend(); iter++) {
-                iter->calcGradInputs();
+                iter->calcGradInputs(retain_grad_graph);
             }
         }
 
