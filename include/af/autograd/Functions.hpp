@@ -30,5 +30,11 @@ namespace af {
 
         Variable negate(const Variable &input);
         Variable reciprocal(const Variable &input);
+
+        Variable exp(const Variable &input);
+        Variable sin(const Variable &input);
+        Variable cos(const Variable &input);
+        Variable tanh(const Variable &input);
+        Variable sigmoid(const Variable &input);
     }
 }
