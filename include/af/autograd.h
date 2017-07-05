@@ -8,4 +8,3 @@
  ********************************************************/
 #include <af/autograd/Variable.hpp>
 #include <af/autograd/Functions.hpp>
-#include <af/autograd/Grad.hpp>

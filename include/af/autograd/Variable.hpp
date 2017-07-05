@@ -159,6 +159,15 @@ namespace af {
                 }
             }
 
+            void backward(Variable grad)
+            {
+                this->addGrad(grad);
+                DAG_t dag = this->build();
+                for (auto iter = dag.rbegin(); iter != dag.rend(); iter++) {
+                    iter->calcGradInputs();
+                }
+            }
+
             DAG_t build()
             {
                 Cache_t cache;

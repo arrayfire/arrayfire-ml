@@ -10,7 +10,6 @@
 #include <af/autograd.h>
 
 using af::autograd::Variable;
-using af::autograd::backward;
 void test1()
 {
     auto x = Variable(af::randu(5), true);
@@ -18,7 +17,7 @@ void test1()
     auto y = x * x;
     af_print(y.array());
     auto dy = Variable(af::constant(1.0, 5), false);
-    backward(y, dy);
+    y.backward(dy);
     auto dx = x.grad();
     af_print(dx.array() - 2 * x.array());
 }
@@ -31,7 +30,7 @@ void test2()
     af_print(y.array());
     auto z = x * x + x * y + y * y;
     auto dz = Variable(af::constant(1.0, 5), false);
-    backward(z, dz);
+    z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
     af_print(dx.array() - 2 * x.array() - y.array());
@@ -46,7 +45,7 @@ void test3()
     af_print(y.array());
     auto z = x * x + x * y + y * y;
     auto dz = Variable(af::constant(1.0, 5), false);
-    backward(z, dz);
+    z.backward(dz);
     auto dy = y.grad();
     af_print(dy.array() - 2 * y.array() - x.array());
     try {
