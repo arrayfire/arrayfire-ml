@@ -96,6 +96,38 @@ void test_multiply_add_scalar()
     VERIFY(dy.array() - (1.0 + x.array()));
 }
 
+void test_exp()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = exp(x);
+    auto dy = Variable(af::constant(1.0, 5), false);
+    y.backward(dy);
+    auto dx = x.grad();
+    VERIFY(dx.array() - (af::exp(x.array())));
+}
+
+void test_sigmoid()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = sigmoid(x);
+    auto dy = Variable(af::constant(1.0, 5), false);
+    y.backward(dy);
+    auto dx = x.grad();
+    VERIFY(dx.array() - (y.array() * (1 - y.array())));
+    VERIFY(dx.array() - (af::sigmoid(x.array()) * (1 - af::sigmoid(x.array()))));
+}
+
+void test_tanh()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = tanh(x);
+    auto dy = Variable(af::constant(1.0, 5), false);
+    y.backward(dy);
+    auto dx = x.grad();
+    VERIFY(dx.array() - (1 - y.array() * y.array()));
+    VERIFY(dx.array() - (1 + af::tanh(x.array())) * (1 - af::tanh(x.array())));
+}
+
 int main()
 {
     af::info();
@@ -105,5 +137,8 @@ int main()
     test_multiply_sub();
     test_divide_add();
     test_multiply_add_scalar();
+    test_exp();
+    test_sigmoid();
+    test_tanh();
     return 0;
 }

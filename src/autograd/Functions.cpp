@@ -55,26 +55,6 @@ namespace af {
             return Variable(result, {lhs, rhs}, grad_func);
         }
 
-        Variable negate(const Variable &input)
-        {
-            auto result = 0.0 - input.array();
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(negate(grad_output));
-            };
-            return Variable(result, {input}, grad_func);
-        }
-
-        Variable reciprocal(const Variable &input)
-        {
-            auto result = 1.0 / input.array();
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                auto res = reciprocal(inputs[0]);
-                inputs[0].addGrad(negate(grad_output) * res * res);
-            };
-            return Variable(result, {input}, grad_func);
-        }
-
-
 #define INSTANTIATE_OPERATOR(OP)                                        \
         Variable operator OP(const double &lhs_val, const Variable &rhs) \
         {                                                               \
@@ -98,5 +78,74 @@ namespace af {
         INSTANTIATE_OPERATOR(-)
         INSTANTIATE_OPERATOR(*)
         INSTANTIATE_OPERATOR(/)
+
+#undef INSTANTIATE_OPERATOR
+
+        Variable negate(const Variable &input)
+        {
+            auto result = 0.0 - input.array();
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(negate(grad_output));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable reciprocal(const Variable &input)
+        {
+            auto result = 1.0 / input.array();
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                auto res = reciprocal(inputs[0]);
+                inputs[0].addGrad(negate(grad_output) * res * res);
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable exp(const Variable &input)
+        {
+            auto result = exp(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(exp(inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable sin(const Variable &input)
+        {
+            auto result = sin(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(cos(inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable cos(const Variable &input)
+        {
+            auto result = cos(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(negate(sin(inputs[0])));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable tanh(const Variable &input)
+        {
+            auto result = tanh(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                auto tmp = tanh(inputs[0]);
+                inputs[0].addGrad(1.0 - tmp * tmp);
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable sigmoid(const Variable &input)
+        {
+            auto result = sigmoid(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                auto tmp = sigmoid(inputs[0]);
+                inputs[0].addGrad(tmp * (1 - tmp));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
     }
 }
