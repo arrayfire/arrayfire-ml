@@ -2,14 +2,9 @@ function(build_example SRC)
   get_filename_component(src_name ${SRC} NAME_WE)
   set(target "${src_name}")
   add_executable(${target} ${SRC})
-  target_include_directories(${target}
-    PRIVATE
-    ${ArrayFire_INCLUDE_DIRS}
-    ${ArrayFireML_INCLUDE_DIRS}
-    )
   target_link_libraries(${target}
     PRIVATE
-    af
+    afml
     )
   target_compile_features(${target}
     PRIVATE cxx_range_for)
