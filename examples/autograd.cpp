@@ -83,6 +83,19 @@ void test_divide_add()
     VERIFY(dy.array() - (1.0 - x.array() / (y.array() * y.array())));
 }
 
+void test_multiply_add_scalar()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = Variable(af::randu(5), true);
+    auto z = 2 * x + x * y + y;
+    auto dz = Variable(af::constant(1.0, 5), false);
+    z.backward(dz);
+    auto dx = x.grad();
+    auto dy = y.grad();
+    VERIFY(dx.array() - (2.0 + y.array()));
+    VERIFY(dy.array() - (1.0 + x.array()));
+}
+
 int main()
 {
     af::info();
@@ -91,5 +104,6 @@ int main()
     test_no_calc_grad();
     test_multiply_sub();
     test_divide_add();
+    test_multiply_add_scalar();
     return 0;
 }

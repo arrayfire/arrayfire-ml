@@ -74,5 +74,29 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
+
+#define INSTANTIATE_OPERATOR(OP)                                        \
+        Variable operator OP(const double &lhs_val, const Variable &rhs) \
+        {                                                               \
+            auto lhs = Variable(                                        \
+                af::constant(lhs_val,                                   \
+                             rhs.array().dims(),                        \
+                             rhs.array().type()),                       \
+                false);                                                 \
+            return lhs OP rhs;                                          \
+        }                                                               \
+        Variable operator OP(const Variable &lhs, const double &rhs_val) \
+        {                                                               \
+            auto rhs = Variable(                                        \
+                af::constant(rhs_val,                                   \
+                             lhs.array().dims(), lhs.array().type()),   \
+                false);                                                 \
+            return lhs OP rhs;                                          \
+        }                                                               \
+
+        INSTANTIATE_OPERATOR(+)
+        INSTANTIATE_OPERATOR(-)
+        INSTANTIATE_OPERATOR(*)
+        INSTANTIATE_OPERATOR(/)
     }
 }
