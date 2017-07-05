@@ -40,5 +40,9 @@ namespace af {
         Variable transpose(const Variable &input);
         Variable expandAs(const Variable &input, const Variable &reference);
         Variable reduceAs(const Variable &input, const Variable &reference);
+
+        Variable matmul(const Variable &lhs, const Variable &rhs);
+        Variable matmulTN(const Variable &lhs, const Variable &rhs);
+        Variable matmulNT(const Variable &lhs, const Variable &rhs);
     }
 }

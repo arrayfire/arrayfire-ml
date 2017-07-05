@@ -184,5 +184,68 @@ namespace af {
             };
             return Variable(result, {input}, grad_func);
         }
+
+        Variable matmul(const Variable &lhs, const Variable &rhs)
+        {
+            // lhs:Input[0] -- [M, N]
+            // rhs:Input[1] -- [N, K]
+            //matmul(lhs, rhs)
+            // -- matmul([M, N], [N, K]) --  [M, K]
+            // result:grad_output -- [M, K]
+            auto result = matmul(lhs.array(), rhs.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                // matmulNT(grad_output, inputs[1])
+                // -- matmulNT([M, K], [N, K])
+                // -- matmul([M, K], [K, N]) -- [M, K]
+                inputs[0].addGrad(matmulNT(grad_output, inputs[1]));
+                // matmulTN(inputs[0], grad_output)
+                // -- matmulTN([M, N], [M, K])
+                // -- matmul([N, M], [M, K]) -- [N, K]
+                inputs[1].addGrad(matmulTN(inputs[0], grad_output));
+            };
+            return Variable(result, {lhs, rhs}, grad_func);
+        }
+
+        Variable matmulTN(const Variable &lhs, const Variable &rhs)
+        {
+            // lhs:Input[0] -- [N, M]
+            // rhs:Input[1] -- [N, K]
+            // matmulTN(lhs, rhs)
+            // -- matmulTN([N, M], [N, K])
+            // -- matmul([M, N], [N, K]) -- [M, K]
+            // result:grad_output -- [M, K]
+            auto result = matmulTN(lhs.array(), rhs.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                // matmulNT(inputs[1], grad_output)
+                // -- matmulNT([N, K], [M, K])
+                // -- matmul([N, K], [K, M]) -- [N, M]
+                inputs[0].addGrad(matmulNT(inputs[1], grad_output));
+                // matmul(inputs[0], grad_output)
+                // -- matmulNT([N, M], [M, K]) -- [N, K]
+                inputs[1].addGrad(matmul(inputs[0], grad_output));
+            };
+            return Variable(result, {lhs, rhs}, grad_func);
+        }
+
+        Variable matmulNT(const Variable &lhs, const Variable &rhs)
+        {
+            // lhs:Input[0] -- [M, N]
+            // rhs:Input[1] -- [K, N]
+            // matmulNT(lhs, rhs)
+            // -- matmulNT([M, N], [K, N])
+            // -- matmul([M, N], [N, K]) -- [M, K]
+            // result:grad_output -- [M, K]
+            auto result = matmulNT(lhs.array(), rhs.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                // matmul(grad_output, inputs[1])
+                // -- matmul([M, K], [K, N]) -- [M, N]
+                inputs[0].addGrad(matmul(grad_output, inputs[1]));
+                // matmulTN(grad_output, inputs[0])
+                // -- matmulTN([M, K], [M, N])
+                // -- matmul([K, M], [M, N]) -- [K, N]
+                inputs[1].addGrad(matmulTN(grad_output, inputs[0]));
+            };
+            return Variable(result, {lhs, rhs}, grad_func);
+        }
     }
 }
