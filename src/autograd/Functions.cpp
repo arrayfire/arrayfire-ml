@@ -147,5 +147,42 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
+        Variable transpose(const Variable &input)
+        {
+            auto result = transpose(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(transpose(grad_output));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable expandAs(const Variable &input, const Variable &reference)
+        {
+            dim4 dims(1,1,1,1);
+            dim4 idims = input.array().dims();
+            dim4 rdims = reference.array().dims();
+            for (int i = 0; i < 4; i++) {
+                dims[i] = rdims[i] / idims[i];
+            }
+            auto result = tile(input.array(), dims);
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(reduceAs(grad_output, inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable reduceAs(const Variable &input, const Variable &reference)
+        {
+            dim4 idims = input.array().dims();
+            dim4 rdims = reference.array().dims();
+            auto result = input.array();
+            for (int i = 0; i < 4; i++) {
+                if (idims[i] != rdims[i]) result = sum(result, i);
+            }
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(expandAs(grad_output, inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
     }
 }
