@@ -9,57 +9,87 @@
 
 #include <af/autograd.h>
 
+#define VERIFY(VAL) do {                                    \
+        auto res = af::allTrue<bool>(af::abs(VAL) < 1E-5);  \
+        printf("%s:%d %s\n", __FUNCTION__, __LINE__,        \
+               res ? "PASS" : "FAIL");                      \
+    } while(0)
+
 using af::autograd::Variable;
-void test1()
+void test_multiply()
 {
     auto x = Variable(af::randu(5), true);
-    af_print(x.array());
     auto y = x * x;
-    af_print(y.array());
     auto dy = Variable(af::constant(1.0, 5), false);
     y.backward(dy);
     auto dx = x.grad();
-    af_print(dx.array() - 2 * x.array());
+    VERIFY(dx.array() - 2 * x.array());
 }
 
-void test2()
+void test_multipl_add()
 {
     auto x = Variable(af::randu(5), true);
-    af_print(x.array());
     auto y = Variable(af::randu(5), true);
-    af_print(y.array());
     auto z = x * x + x * y + y * y;
     auto dz = Variable(af::constant(1.0, 5), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
-    af_print(dx.array() - 2 * x.array() - y.array());
-    af_print(dy.array() - 2 * y.array() - x.array());
+    VERIFY(dx.array() - 2 * x.array() - y.array());
+    VERIFY(dy.array() - 2 * y.array() - x.array());
 }
 
-void test3()
+void test_no_calc_grad()
 {
     auto x = Variable(af::randu(5), false);
-    af_print(x.array());
     auto y = Variable(af::randu(5), true);
-    af_print(y.array());
     auto z = x * x + x * y + y * y;
     auto dz = Variable(af::constant(1.0, 5), false);
     z.backward(dz);
     auto dy = y.grad();
-    af_print(dy.array() - 2 * y.array() - x.array());
+    VERIFY(dy.array() - 2 * y.array() - x.array());
     try {
         auto dx = x.grad();
     } catch(af::exception &ex) {
         std::cout << ex.what() << std::endl;
+        return;
     }
+    printf("%s:%d No Gradient check Failed\n");
+}
+
+void test_multiply_sub()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = Variable(af::randu(5), true);
+    auto z = x * x - x * y;
+    auto dz = Variable(af::constant(1.0, 5), false);
+    z.backward(dz);
+    auto dx = x.grad();
+    auto dy = y.grad();
+    VERIFY(dx.array() - (2 * x.array() - y.array()));
+    VERIFY(dy.array() - (-x.array()));
+}
+
+void test_divide_add()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = Variable(af::randu(5), true);
+    auto z = x + x / y + y;
+    auto dz = Variable(af::constant(1.0, 5), false);
+    z.backward(dz);
+    auto dx = x.grad();
+    auto dy = y.grad();
+    VERIFY(dx.array() - (1.0 + 1.0 / y.array()));
+    VERIFY(dy.array() - (1.0 - x.array() / (y.array() * y.array())));
 }
 
 int main()
 {
     af::info();
-    test1();
-    test2();
-    test3();
+    test_multiply();
+    test_multipl_add();
+    test_no_calc_grad();
+    test_multiply_sub();
+    test_divide_add();
     return 0;
 }

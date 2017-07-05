@@ -21,7 +21,7 @@ namespace af {
             m_grad_func(nullptr)
         {}
 
-        Variable::Shared::Shared(af::array data, bool calc_grad) :
+        Variable::Shared::Shared(const af::array &data, bool calc_grad) :
             m_calc_grad(calc_grad),
             m_data(data),
             m_inputs(),
@@ -29,8 +29,8 @@ namespace af {
             m_grad_func(nullptr)
         {}
 
-        Variable::Shared::Shared(af::array data,
-                                 std::vector<Variable> inputs,
+        Variable::Shared::Shared(const af::array &data,
+                                 const std::vector<Variable> &inputs,
                                  GradFunc_t grad_func,
                                  bool calc_grad) :
             m_calc_grad(calc_grad),
@@ -45,13 +45,13 @@ namespace af {
         {
         }
 
-        Variable::Variable(af::array data, bool calc_grad) :
+        Variable::Variable(const af::array &data, bool calc_grad) :
             m_shared(new Shared(data, calc_grad))
         {}
 
-        Variable::Variable(af::array data,
-                 std::vector<Variable> inputs,
-                 GradFunc_t grad_func) :
+        Variable::Variable(const af::array &data,
+                           const std::vector<Variable> &inputs,
+                           GradFunc_t grad_func) :
             m_shared(nullptr)
         {
             bool calc_grad = false;
@@ -81,7 +81,7 @@ namespace af {
             return m_shared->m_grads[0];
         }
 
-        bool Variable::isCalcGrad()
+        bool Variable::isCalcGrad() const
         {
             return m_shared->m_calc_grad;
         }
@@ -96,7 +96,7 @@ namespace af {
             }
         }
 
-        void Variable::addGrad(Variable child_grad)
+        void Variable::addGrad(const Variable &child_grad)
         {
             if (m_shared->m_calc_grad) {
                 m_shared->m_grads.push_back(child_grad);
@@ -107,13 +107,17 @@ namespace af {
         {
             // Flag asking not to calculate gradients
             if (!m_shared->m_calc_grad) return;
-            Variable grad = m_shared->m_grads[0];
-            for (unsigned i = 1; i < m_shared->m_grads.size(); i++) {
-                grad = grad + m_shared->m_grads[i];
+
+            // Best not to evaluate the JIT immediately if theres only a single gradient
+            if (m_shared->m_grads.size() > 1) {
+                Variable grad = m_shared->m_grads[0];
+                for (unsigned i = 1; i < m_shared->m_grads.size(); i++) {
+                    grad = grad + m_shared->m_grads[i];
+                }
+                grad.array().eval();
+                m_shared->m_grads.clear();
+                m_shared->m_grads.push_back(grad);
             }
-            grad.array().eval();
-            m_shared->m_grads.clear();
-            m_shared->m_grads.push_back(grad);
         }
 
         void Variable::calcGradInputs()
@@ -124,7 +128,7 @@ namespace af {
             }
         }
 
-        void Variable::backward(Variable grad)
+        void Variable::backward(const Variable &grad)
         {
             this->addGrad(grad);
             Variable::DAG_t dag = this->build();

@@ -22,16 +22,16 @@ namespace af {
         class Variable
         {
         public:
-            typedef std::function<void(std::vector<Variable>, Variable)> GradFunc_t;
+            typedef std::function<void(std::vector<Variable> &, const Variable &)> GradFunc_t;
             typedef std::unordered_map<std::ptrdiff_t, bool> Cache_t;
             typedef std::vector<Variable> DAG_t;
 
         private:
             struct Shared {
                 Shared();
-                Shared(af::array data, bool calc_grad);
-                Shared(af::array data,
-                       std::vector<Variable> inputs,
+                Shared(const af::array &data, bool calc_grad);
+                Shared(const af::array &data,
+                       const std::vector<Variable> &inputs,
                        GradFunc_t grad_func,
                        bool calc_grad);
 
@@ -45,26 +45,26 @@ namespace af {
             public:
 
             Variable();
-            Variable(af::array data, bool calc_grad);
-            Variable(af::array data,
-                     std::vector<Variable> inputs,
+            Variable(const af::array &data, bool calc_grad);
+            Variable(const af::array &data,
+                     const std::vector<Variable> &inputs,
                      GradFunc_t grad_func);
 
             af::array array() const;
 
             Variable grad() const;
 
-            bool isCalcGrad();
+            bool isCalcGrad() const;
 
             void setCalcGrad(bool calc_grad);
 
-            void addGrad(Variable child_grad);
+            void addGrad(const Variable &child_grad);
 
             void evalGrad();
 
             void calcGradInputs();
 
-            void backward(Variable grad);
+            void backward(const Variable &grad);
 
             DAG_t build();
 

@@ -13,7 +13,12 @@ namespace af {
 
         class Variable;
 
-        Variable operator +(const Variable lhs, const Variable rhs);
-        Variable operator *(const Variable lhs, const Variable rhs);
+        Variable operator +(const Variable &lhs, const Variable &rhs);
+        Variable operator *(const Variable &lhs, const Variable &rhs);
+        Variable operator -(const Variable &lhs, const Variable &rhs);
+        Variable operator /(const Variable &lhs, const Variable &rhs);
+
+        Variable negate(const Variable &input);
+        Variable reciprocal(const Variable &input);
     }
 }
