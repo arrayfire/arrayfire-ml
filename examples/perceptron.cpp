@@ -18,7 +18,7 @@ int main()
 {
     const int inputSize  = 2;
     const int outputSize = 1;
-    const double lr = 0.005;
+    const double lr = 0.1;
     const int numSamples = 4;
 
     float hInput[] = {1, 1,
@@ -40,8 +40,10 @@ int main()
     perceptron.add(nn::Sigmoid());
 
     Variable result;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
         for (int j = 0; j < numSamples; j++) {
+            perceptron.train();
+            perceptron.zeroGrad();
 
             af::array in_j = in(af::span, j);
             af::array out_j = out(af::span, j);
@@ -65,7 +67,9 @@ int main()
             }
         }
 
-        if ((i + 1) % 10 == 0) {
+        if ((i + 1) % 100 == 0) {
+            perceptron.eval();
+
             // Forward propagation
             result = perceptron.forward(nn::input(in));
 

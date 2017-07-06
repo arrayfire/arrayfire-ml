@@ -32,6 +32,19 @@ namespace af
             }
         }
 
+        void Module::train()
+        {
+            for (auto parameter : m_parameters) {
+                parameter.setCalcGrad(true);
+            }
+        }
+
+        void Module::eval()
+        {
+            for (auto parameter : m_parameters) {
+                parameter.setCalcGrad(false);
+            }
+        }
 
         std::vector<Variable> Module::parameters()
         {
