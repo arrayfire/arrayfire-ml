@@ -10,8 +10,13 @@ add_library(afml SHARED "")
 
 target_sources(afml
   PRIVATE
-  src/autograd/Variable.cpp
   src/autograd/Functions.cpp
+  src/autograd/Variable.cpp
+  src/nn/Modules/Activations.cpp
+  src/nn/Modules/Container.cpp
+  src/nn/Modules/Linear.cpp
+  src/nn/Modules/Module.cpp
+  src/nn/Types.cpp
   )
 
 target_include_directories(afml

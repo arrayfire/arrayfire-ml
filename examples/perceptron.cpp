@@ -7,17 +7,19 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
+#include <af/autograd.h>
 #include <af/nn.h>
 
 using namespace af;
 using namespace af::nn;
+using namespace af::autograd;
 
 int main()
 {
     const int inputSize  = 2;
     const int outputSize = 1;
     const int numSamples = 4;
-    const double lr = 10;
+    const double lr = 0.005;
 
     float hInput[] = {1, 1,
                       0, 0,
@@ -29,29 +31,36 @@ int main()
                        1,
                        1};
 
-    af::array in(inputSize, numSamples, hInput);
-    af::array out(outputSize, numSamples, hOutput);
+    auto in = af::array(inputSize, numSamples, hInput);
+    auto out = af::array(outputSize, numSamples, hOutput);
 
-    std::vector<NodePtr> perceptron;
-    perceptron.emplace_back(new LinearNode(inputSize, outputSize, 10));
-    perceptron.emplace_back(new Sigmoid(inputSize));
+    nn::Sequential perceptron;
 
+    perceptron.add(nn::Linear(inputSize, outputSize));
+    perceptron.add(nn::Sigmoid());
+
+    Variable result;
     for (int i = 0; i < 10; i++) {
-        ArrayVector data = {in};
 
-        std::vector<ArrayVector> inputs(2);
-        for (int n = 0; n < 2; n++) {
-            inputs[n] = data;
-            data = perceptron[n]->forward(data);
-        }
+        // Forward propagation
+        result = perceptron.forward(nn::input(in));
 
-        data[0] = out - data[0];
+        // Calculate loss
+        // TODO: Use loss function
+        af::array diff = out - result.array();
+        printf("Error at iteration(%d) : %lf\n", i + 1, af::max<float>(af::abs(diff)));
 
-        printf("Error at iteration(%d) : %lf\n", i + 1, af::sum<float>(af::abs(data[0])) / numSamples);
+        // Backward propagation
+        auto d_result = Variable(diff, false);
+        result.backward(d_result);
 
-        for (int n = 1; n >= 0; n--) {
-            data = perceptron[n]->backward(inputs[n], data);
-            perceptron[n]->update(lr);
+        // Update parameters
+        // TODO: Should use optimizer
+        for (auto param : perceptron.parameters()) {
+            param.array() += lr * param.grad().array();
+            param.array().eval();
         }
     }
+    af_print(result.array());
+    return 0;
 }

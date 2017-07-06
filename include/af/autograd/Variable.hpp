@@ -50,13 +50,17 @@ namespace af {
                      const std::vector<Variable> &inputs,
                      GradFunc_t grad_func);
 
-            af::array array() const;
+            af::array& array() const;
 
             Variable grad() const;
 
             std::ptrdiff_t id() const;
 
             bool isCalcGrad() const;
+
+            bool isGradAvailable() const;
+
+            void zeroGrad();
 
             void setCalcGrad(bool calc_grad);
 

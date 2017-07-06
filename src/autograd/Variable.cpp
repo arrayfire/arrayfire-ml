@@ -65,7 +65,7 @@ namespace af {
             }
         }
 
-        af::array Variable::array() const
+        af::array& Variable::array() const
         {
             return m_shared->m_data;
         }
@@ -94,6 +94,17 @@ namespace af {
         bool Variable::isCalcGrad() const
         {
             return m_shared->m_calc_grad;
+        }
+
+        bool Variable::isGradAvailable() const
+        {
+            if (!m_shared->m_calc_grad) return false;
+            return m_shared->m_grads.size() >= 1;
+        }
+
+        void Variable::zeroGrad()
+        {
+            m_shared->m_grads.clear();
         }
 
         void Variable::setCalcGrad(bool calc_grad)

@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2015, ArrayFire
+ * Copyright (c) 2017, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -9,8 +9,5 @@
 
 #pragma once
 
-#include <af/nn/common.hpp>
-#include <af/nn/Nodes.hpp>
-#include <af/nn/Weights.hpp>
-#include <af/nn/Activations.hpp>
-#include <af/nn/Networks.hpp>
+#include <af/nn/Modules.hpp>
+#include <af/nn/Types.hpp>
