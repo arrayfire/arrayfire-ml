@@ -104,7 +104,7 @@ namespace af {
         {
             auto result = exp(input.array());
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(exp(inputs[0]));
+                inputs[0].addGrad(grad_output * exp(inputs[0]));
             };
             return Variable(result, {input}, grad_func);
         }
@@ -113,7 +113,7 @@ namespace af {
         {
             auto result = sin(input.array());
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(cos(inputs[0]));
+                inputs[0].addGrad(grad_output * cos(inputs[0]));
             };
             return Variable(result, {input}, grad_func);
         }
@@ -122,7 +122,7 @@ namespace af {
         {
             auto result = cos(input.array());
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(negate(sin(inputs[0])));
+                inputs[0].addGrad(grad_output * negate(sin(inputs[0])));
             };
             return Variable(result, {input}, grad_func);
         }
@@ -132,7 +132,7 @@ namespace af {
             auto result = tanh(input.array());
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
                 auto tmp = tanh(inputs[0]);
-                inputs[0].addGrad(1.0 - tmp * tmp);
+                inputs[0].addGrad(grad_output * (1.0 - tmp * tmp));
             };
             return Variable(result, {input}, grad_func);
         }
@@ -142,7 +142,7 @@ namespace af {
             auto result = sigmoid(input.array());
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
                 auto tmp = sigmoid(inputs[0]);
-                inputs[0].addGrad(tmp * (1 - tmp));
+                inputs[0].addGrad(grad_output * tmp * (1 - tmp));
             };
             return Variable(result, {input}, grad_func);
         }
