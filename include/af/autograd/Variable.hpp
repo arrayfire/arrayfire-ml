@@ -54,6 +54,8 @@ namespace af {
 
             Variable grad() const;
 
+            std::ptrdiff_t id() const;
+
             bool isCalcGrad() const;
 
             void setCalcGrad(bool calc_grad);
@@ -64,11 +66,16 @@ namespace af {
 
             void backward(const Variable &grad, bool retain_grad_graph = false);
 
-            void buildSubGraph(Cache_t &cache, DAG_t &dag);
+
         private:
             void evalGrad(bool retain_grad_graph = false);
 
-            DAG_t build();
+            std::vector<Variable> getInputs() const;
+
+            static void buildSubGraph(Cache_t &cache, DAG_t &dag, const Variable &var);
+
+            static DAG_t build(const Variable &var);
+
             std::shared_ptr<Shared> m_shared;
         };
     }

@@ -81,6 +81,16 @@ namespace af {
             return m_shared->m_grads[0];
         }
 
+        std::ptrdiff_t Variable::id() const
+        {
+            return (std::ptrdiff_t)m_shared.get();
+        }
+
+        std::vector<Variable> Variable::getInputs() const
+        {
+            return m_shared->m_inputs;
+        }
+
         bool Variable::isCalcGrad() const
         {
             return m_shared->m_calc_grad;
@@ -140,31 +150,31 @@ namespace af {
         void Variable::backward(const Variable &grad, bool retain_grad_graph)
         {
             this->addGrad(grad);
-            Variable::DAG_t dag = this->build();
+            Variable::DAG_t dag = Variable::build(*this);
             for (auto iter = dag.rbegin(); iter != dag.rend(); iter++) {
                 iter->calcGradInputs(retain_grad_graph);
             }
         }
 
-        Variable::DAG_t Variable::build()
+        Variable::DAG_t Variable::build(const Variable &var)
         {
             Cache_t cache;
-                    Variable::DAG_t dag;
-            this->buildSubGraph(cache, dag);
+            Variable::DAG_t dag;
+            Variable::buildSubGraph(cache, dag, var);
             return dag;
         }
 
-        void Variable::buildSubGraph(Cache_t &cache, Variable::DAG_t &dag)
+        void Variable::buildSubGraph(Cache_t &cache, Variable::DAG_t &dag, const Variable &var)
         {
-            std::ptrdiff_t id = (std::ptrdiff_t)m_shared.get();
+            std::ptrdiff_t id = var.id();
             if (cache.find(id) != cache.end()) {
                 return;
             }
-            for (auto input : m_shared->m_inputs) {
-                input.buildSubGraph(cache, dag);
+            for (auto input : var.getInputs()) {
+                Variable::buildSubGraph(cache, dag, input);
             }
             cache[id] = true;
-            dag.push_back(*this);
+            dag.push_back(var);
         }
     }
 }
