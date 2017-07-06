@@ -35,6 +35,10 @@ namespace af
 
             void zeroGrad();
 
+            void train();
+
+            void eval();
+
             virtual autograd::Variable forward(const autograd::Variable &input) = 0;
         };
     }
