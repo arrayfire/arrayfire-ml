@@ -61,7 +61,7 @@ int main()
 
             // Update parameters
             // TODO: Should use optimizer
-            for (auto param : perceptron.parameters()) {
+            for (auto &param : perceptron.parameters()) {
                 param.array() += lr * param.grad().array();
                 param.array().eval();
             }

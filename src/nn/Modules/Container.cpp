@@ -33,7 +33,7 @@ namespace af
         Variable Sequential::forward(const Variable &input)
         {
             Variable output = input;
-            for(auto module : m_modules) {
+            for (auto &module : m_modules) {
                 output = module->forward(output);
             }
             return output;

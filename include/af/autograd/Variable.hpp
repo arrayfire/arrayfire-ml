@@ -52,7 +52,7 @@ namespace af {
 
             af::array& array() const;
 
-            Variable grad() const;
+            Variable& grad() const;
 
             std::ptrdiff_t id() const;
 
@@ -74,7 +74,7 @@ namespace af {
         private:
             void evalGrad(bool retain_grad_graph = false);
 
-            std::vector<Variable> getInputs() const;
+            std::vector<Variable>& getInputs() const;
 
             static void buildSubGraph(Cache_t &cache, DAG_t &dag, const Variable &var);
 

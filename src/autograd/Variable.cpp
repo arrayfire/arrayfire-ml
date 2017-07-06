@@ -55,7 +55,7 @@ namespace af {
             m_shared(nullptr)
         {
             bool calc_grad = false;
-            for (auto input : inputs) {
+            for (const auto &input : inputs) {
                 calc_grad |= input.isCalcGrad();
             }
             if (calc_grad) {
@@ -70,7 +70,7 @@ namespace af {
             return m_shared->m_data;
         }
 
-        Variable Variable::grad() const
+        Variable& Variable::grad() const
         {
             if (!m_shared->m_calc_grad) {
                 throw af::exception("Gradient calclation disabled.");
@@ -86,7 +86,7 @@ namespace af {
             return (std::ptrdiff_t)m_shared.get();
         }
 
-        std::vector<Variable> Variable::getInputs() const
+        std::vector<Variable>& Variable::getInputs() const
         {
             return m_shared->m_inputs;
         }
@@ -181,7 +181,7 @@ namespace af {
             if (cache.find(id) != cache.end()) {
                 return;
             }
-            for (auto input : var.getInputs()) {
+            for (const auto &input : var.getInputs()) {
                 Variable::buildSubGraph(cache, dag, input);
             }
             cache[id] = true;
