@@ -42,7 +42,7 @@ namespace af {
                 GradFunc_t m_grad_func;
             };
 
-            public:
+        public:
 
             Variable();
             Variable(const af::array &data, bool calc_grad);
