@@ -18,8 +18,8 @@ int main()
 {
     const int inputSize  = 2;
     const int outputSize = 1;
-    const int numSamples = 4;
     const double lr = 0.005;
+    const int numSamples = 4;
 
     float hInput[] = {1, 1,
                       0, 0,
@@ -40,27 +40,45 @@ int main()
     perceptron.add(nn::Sigmoid());
 
     Variable result;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < numSamples; j++) {
 
-        // Forward propagation
-        result = perceptron.forward(nn::input(in));
+            af::array in_j = in(af::span, j);
+            af::array out_j = out(af::span, j);
 
-        // Calculate loss
-        // TODO: Use loss function
-        af::array diff = out - result.array();
-        printf("Error at iteration(%d) : %lf\n", i + 1, af::max<float>(af::abs(diff)));
+            // Forward propagation
+            result = perceptron.forward(nn::input(in_j));
 
-        // Backward propagation
-        auto d_result = Variable(diff, false);
-        result.backward(d_result);
+            // Calculate loss
+            // TODO: Use loss function
+            af::array diff = out_j - result.array();
 
-        // Update parameters
-        // TODO: Should use optimizer
-        for (auto param : perceptron.parameters()) {
-            param.array() += lr * param.grad().array();
-            param.array().eval();
+            // Backward propagation
+            auto d_result = Variable(diff, false);
+            result.backward(d_result);
+
+            // Update parameters
+            // TODO: Should use optimizer
+            for (auto param : perceptron.parameters()) {
+                param.array() += lr * param.grad().array();
+                param.array().eval();
+            }
+        }
+
+        if ((i + 1) % 10 == 0) {
+            // Forward propagation
+            result = perceptron.forward(nn::input(in));
+
+            // Calculate loss
+            // TODO: Use loss function
+            af::array diff = out - result.array();
+            printf("Average Error at iteration(%d) : %lf\n", i + 1, af::mean<float>(af::abs(diff)));
+            printf("Predicted\n");
+            af_print(result.array());
+            printf("Expected\n");
+            af_print(out);
+            printf("\n\n");
         }
     }
-    af_print(result.array());
     return 0;
 }
