@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2015, ArrayFire
+ * Copyright (c) 2017, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -8,4 +8,7 @@
  ********************************************************/
 #pragma once
 
-#include <af/nn/Networks/FFNet.hpp>
+#include <af/nn/Modules/Module.hpp>
+#include <af/nn/Modules/Linear.hpp>
+#include <af/nn/Modules/Container.hpp>
+#include <af/nn/Modules/Activations.hpp>

@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2015, ArrayFire
+ * Copyright (c) 2017, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -8,13 +8,15 @@
  ********************************************************/
 #pragma once
 
-#include <af/nn/Activations/Activation.hpp>
-#include <af/nn/Activations/Threshold.hpp>
+#include <af/autograd/Variable.hpp>
 
-namespace af
-{
-    namespace nn
-    {
-        typedef ThresholdNode ReLU;
+namespace af {
+    namespace nn {
+
+        autograd::Variable input(const af::array &arr);
+
+        autograd::Variable parameter(const af::array &arr);
+
+        autograd::Variable weight(int input_size, int output_size, float spread = 0.05);
     }
 }
