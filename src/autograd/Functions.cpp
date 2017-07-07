@@ -61,11 +61,25 @@ namespace af {
             return Variable(result, false);
         }
 
+        Variable operator <(const Variable &lhs, const Variable &rhs)
+        {
+            auto result = lhs.array() < rhs.array();
+            return Variable(result, false);
+        }
+
+        Variable operator >=(const Variable &lhs, const Variable &rhs)
+        {
+            auto result = lhs.array() >= rhs.array();
+            return Variable(result, false);
+        }
+
         Variable operator <=(const Variable &lhs, const Variable &rhs)
         {
             auto result = lhs.array() <= rhs.array();
             return Variable(result, false);
         }
+
+
 
 #define INSTANTIATE_OPERATOR(OP)                                        \
         Variable operator OP(const double &lhs_val, const Variable &rhs) \
@@ -91,6 +105,8 @@ namespace af {
         INSTANTIATE_OPERATOR(*)
         INSTANTIATE_OPERATOR(/)
         INSTANTIATE_OPERATOR(>)
+        INSTANTIATE_OPERATOR(<)
+        INSTANTIATE_OPERATOR(>=)
         INSTANTIATE_OPERATOR(<=)
 
 #undef INSTANTIATE_OPERATOR
@@ -105,6 +121,18 @@ namespace af {
         {
           auto mask = lhs > rhs;
           auto result = max(lhs.array(), rhs.array());
+
+          auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+            inputs[0].addGrad( inputs[2] * grad_output);
+            inputs[1].addGrad(!inputs[2] * grad_output);
+          };
+          return Variable(result, {lhs, rhs, mask}, grad_func);
+        }
+
+        Variable min(const Variable &lhs, const Variable &rhs)
+        {
+          auto mask = lhs < rhs;
+          auto result = min(lhs.array(), rhs.array());
 
           auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
             inputs[0].addGrad( inputs[2] * grad_output);
@@ -134,6 +162,7 @@ namespace af {
 
 
       INSTANTIATE_FUNCTION(max);
+      INSTANTIATE_FUNCTION(min);
 
 #undef INSTANTIATE_FUNCTION
       
