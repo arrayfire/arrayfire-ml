@@ -30,5 +30,23 @@ namespace af
 
             autograd::Variable forward(const autograd::Variable &input);
         };
+
+        class ReLU : public Module
+        {
+        public:
+            ReLU();
+         
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+      
+        class LeakyReLU : public Module
+        {
+        private:
+            double m_slope;
+        public:
+            LeakyReLU(double slope = 0.0);
+         
+            autograd::Variable forward(const autograd::Variable &input);
+        };
     }
 }

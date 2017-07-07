@@ -29,5 +29,22 @@ namespace af
         {
             return tanh(input);
         }
+
+        ReLU::ReLU() {}
+
+        Variable ReLU::forward(const Variable &input)
+        {
+            return max(input, 0.0);
+        }
+
+        LeakyReLU::LeakyReLU(double slope) :
+            m_slope(slope)
+        {
+        }
+
+        Variable LeakyReLU::forward(const Variable &input)
+        {
+            return max(input, m_slope * input);
+        }
     }
 }
