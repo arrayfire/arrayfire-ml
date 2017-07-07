@@ -54,6 +54,18 @@ namespace af {
             };
             return Variable(result, {lhs, rhs}, grad_func);
         }
+      
+        Variable operator >(const Variable &lhs, const Variable &rhs)
+        {
+            auto result = lhs.array() > rhs.array();
+            return Variable(result, false);
+        }
+
+        Variable operator <=(const Variable &lhs, const Variable &rhs)
+        {
+            auto result = lhs.array() <= rhs.array();
+            return Variable(result, false);
+        }
 
 #define INSTANTIATE_OPERATOR(OP)                                        \
         Variable operator OP(const double &lhs_val, const Variable &rhs) \
@@ -78,10 +90,54 @@ namespace af {
         INSTANTIATE_OPERATOR(-)
         INSTANTIATE_OPERATOR(*)
         INSTANTIATE_OPERATOR(/)
+        INSTANTIATE_OPERATOR(>)
+        INSTANTIATE_OPERATOR(<=)
 
 #undef INSTANTIATE_OPERATOR
 
-        Variable negate(const Variable &input)
+        Variable operator !(const Variable &input)
+        {
+            auto result = !input.array();
+            return Variable(result, false);
+        }
+          
+        Variable max(const Variable &lhs, const Variable &rhs)
+        {
+          auto mask = lhs > rhs;
+          auto result = max(lhs.array(), rhs.array());
+
+          auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+            inputs[0].addGrad( inputs[2] * grad_output);
+            inputs[1].addGrad(!inputs[2] * grad_output);
+          };
+          return Variable(result, {lhs, rhs, mask}, grad_func);
+        }
+
+#define INSTANTIATE_FUNCTION(FN)                                        \
+        Variable FN(const double &lhs_val, const Variable &rhs)         \
+        {                                                               \
+            auto lhs = Variable(                                        \
+                af::constant(lhs_val,                                   \
+                             rhs.array().dims(),                        \
+                             rhs.array().type()),                       \
+                false);                                                 \
+            return FN(lhs,rhs);                                         \
+        }                                                               \
+        Variable FN(const Variable &lhs, const double &rhs_val)         \
+        {                                                               \
+            auto rhs = Variable(                                        \
+                af::constant(rhs_val,                                   \
+                             lhs.array().dims(), lhs.array().type()),   \
+                false);                                                 \
+            return FN(lhs, rhs);                                        \
+        }
+
+
+      INSTANTIATE_FUNCTION(max);
+
+#undef INSTANTIATE_FUNCTION
+      
+      Variable negate(const Variable &input)
         {
             auto result = 0.0 - input.array();
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {

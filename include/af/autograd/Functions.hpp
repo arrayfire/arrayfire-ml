@@ -36,7 +36,11 @@ namespace af {
         Variable cos(const Variable &input);
         Variable tanh(const Variable &input);
         Variable sigmoid(const Variable &input);
-
+      
+        Variable max(const Variable &lhs, const Variable &rhs);
+        Variable max(const Variable &lhs, const double &rhs);
+        Variable max(const double &lhs, const Variable &rhs);
+      
         Variable transpose(const Variable &input);
         Variable expandAs(const Variable &input, const Variable &reference);
         Variable reduceAs(const Variable &input, const Variable &reference);
@@ -44,5 +48,7 @@ namespace af {
         Variable matmul(const Variable &lhs, const Variable &rhs);
         Variable matmulTN(const Variable &lhs, const Variable &rhs);
         Variable matmulNT(const Variable &lhs, const Variable &rhs);
+
+
     }
 }
