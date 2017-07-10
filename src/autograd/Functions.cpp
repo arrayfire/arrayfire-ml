@@ -119,26 +119,26 @@ namespace af {
           
         Variable max(const Variable &lhs, const Variable &rhs)
         {
-          auto mask = lhs > rhs;
-          auto result = max(lhs.array(), rhs.array());
+            auto mask = lhs > rhs;
+            auto result = max(lhs.array(), rhs.array());
 
-          auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-            inputs[0].addGrad( inputs[2] * grad_output);
-            inputs[1].addGrad(!inputs[2] * grad_output);
-          };
-          return Variable(result, {lhs, rhs, mask}, grad_func);
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad( inputs[2] * grad_output);
+                inputs[1].addGrad(!inputs[2] * grad_output);
+            };
+            return Variable(result, {lhs, rhs, mask}, grad_func);
         }
 
         Variable min(const Variable &lhs, const Variable &rhs)
         {
-          auto mask = lhs < rhs;
-          auto result = min(lhs.array(), rhs.array());
+            auto mask = lhs < rhs;
+            auto result = min(lhs.array(), rhs.array());
 
-          auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-            inputs[0].addGrad( inputs[2] * grad_output);
-            inputs[1].addGrad(!inputs[2] * grad_output);
-          };
-          return Variable(result, {lhs, rhs, mask}, grad_func);
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+              inputs[0].addGrad( inputs[2] * grad_output);
+              inputs[1].addGrad(!inputs[2] * grad_output);
+            };
+            return Variable(result, {lhs, rhs, mask}, grad_func);
         }
 
 #define INSTANTIATE_FUNCTION(FN)                                        \

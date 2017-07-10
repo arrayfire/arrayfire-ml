@@ -67,6 +67,17 @@ namespace af
 
             autograd::Variable forward(const autograd::Variable &input);
         };
+
+        class ThresholdReLU : public Module
+        {
+        private:
+            double m_threshold;
+        public:
+            ThresholdReLU(double threshold = 1.0);
+         
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+
       
 
     }
