@@ -60,22 +60,30 @@ namespace af
 
         Variable PReLU::forward(const Variable &input)
         {
-            auto tmp = max(input, 0.0);
-            auto res = expandAs(m_parameters[0],tmp) * tmp;
-            //TODO: Determine if doing the max after the mul is preferable
-            return res;
-
+            auto mask = input >= 0.0;
+            return (input * mask) + (input * !mask * expandAs(m_parameters[0],input));
         }
 
         ELU::ELU(double alpha) :
-          m_alpha(alpha)
+            m_alpha(alpha)
         {
         }
 
         Variable ELU::forward(const Variable &input)
         {
-            auto res = max(input, m_alpha * (exp(input) - 1));
-            return res;
+            auto mask = input >= 0.0;
+            return (mask * input) + (!mask * m_alpha * (exp(input)-1));
+        }
+
+        ThresholdReLU::ThresholdReLU(double threshold) :
+            m_threshold(threshold)
+        {
+        }
+
+        Variable ThresholdReLU::forward(const Variable &input)
+        {
+            auto mask = input >= m_threshold;
+            return input * mask;
         }
       
     }

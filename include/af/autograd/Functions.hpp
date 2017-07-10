@@ -40,6 +40,8 @@ namespace af {
         Variable operator >=(const Variable &lhs, const double &rhs);
         Variable operator <=(const Variable &lhs, const double &rhs);
 
+        Variable operator !(const Variable &input);
+
         Variable negate(const Variable &input);
         Variable reciprocal(const Variable &input);
 
