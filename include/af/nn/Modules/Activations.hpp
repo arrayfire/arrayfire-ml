@@ -58,5 +58,16 @@ namespace af
             autograd::Variable forward(const autograd::Variable &input);
         };
 
+        class ELU : public Module
+        {
+        private:
+            double m_alpha;
+        public:
+            ELU(double alpha = 1.0);
+
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+      
+
     }
 }
