@@ -67,5 +67,16 @@ namespace af
 
         }
 
+        ELU::ELU(double alpha) :
+          m_alpha(alpha)
+        {
+        }
+
+        Variable ELU::forward(const Variable &input)
+        {
+            auto res = max(input, m_alpha * (exp(input) - 1));
+            return res;
+        }
+      
     }
 }
