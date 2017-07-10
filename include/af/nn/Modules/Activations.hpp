@@ -48,5 +48,15 @@ namespace af
          
             autograd::Variable forward(const autograd::Variable &input);
         };
+
+        class PReLU : public Module
+        {
+        public:
+            PReLU(int size, double spread = 1.0);
+            PReLU(const autograd::Variable &w);
+         
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+
     }
 }
