@@ -270,6 +270,49 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
+        Variable tile(const Variable &input, const std::vector<int> &repeats)
+        {
+            dim4 dims;
+            for (size_t i = 0; i < repeats.size(); i++) {
+                dims[i] = repeats[i];
+            }
+            auto result = tile(input.array(), dims);
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(sumAs(grad_output, inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable sum(const Variable &input, const std::vector<int> &axes)
+        {
+            auto result = input.array();
+            for (size_t i = 0; i < axes.size(); i++) {
+                result = sum(result, axes[i]);
+            }
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(tileAs(grad_output, inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable mean(const Variable &input, const std::vector<int> &axes)
+        {
+            auto result = input.array();
+            for (size_t i = 0; i < axes.size(); i++) {
+                result = mean(result, axes[i]);
+            }
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                dim4 odims = grad_output.dims();
+                dim4 idims = inputs[0].dims();
+                dim_t count = 1;
+                for (int i = 0; i < 4; i++) {
+                    count *= idims[i] / odims[i];
+                }
+                inputs[0].addGrad(count * tileAs(grad_output, inputs[0]));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
         Variable matmul(const Variable &lhs, const Variable &rhs)
         {
             // lhs:Input[0] -- [M, N]
