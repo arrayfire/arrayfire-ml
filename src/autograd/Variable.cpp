@@ -102,6 +102,11 @@ namespace af {
             return m_shared->m_grads.size() >= 1;
         }
 
+        af::dim4 Variable::dims() const
+        {
+            return m_shared->m_data.dims();
+        }
+
         void Variable::zeroGrad()
         {
             m_shared->m_grads.clear();
