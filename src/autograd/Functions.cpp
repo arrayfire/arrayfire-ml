@@ -54,7 +54,7 @@ namespace af {
             };
             return Variable(result, {lhs, rhs}, grad_func);
         }
-      
+
         Variable operator >(const Variable &lhs, const Variable &rhs)
         {
             auto result = lhs.array() > rhs.array();
@@ -116,7 +116,7 @@ namespace af {
             auto result = !input.array();
             return Variable(result, false);
         }
-          
+
         Variable max(const Variable &lhs, const Variable &rhs)
         {
             auto mask = lhs > rhs;
@@ -165,7 +165,7 @@ namespace af {
       INSTANTIATE_FUNCTION(min);
 
 #undef INSTANTIATE_FUNCTION
-      
+
       Variable negate(const Variable &input)
         {
             auto result = 0.0 - input.array();
@@ -241,31 +241,31 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
-        Variable expandAs(const Variable &input, const Variable &reference)
+        Variable tileAs(const Variable &input, const Variable &reference)
         {
             dim4 dims(1,1,1,1);
-            dim4 idims = input.array().dims();
-            dim4 rdims = reference.array().dims();
+            dim4 rdims = reference.dims();
+            dim4 idims = input.dims();
             for (int i = 0; i < 4; i++) {
                 dims[i] = rdims[i] / idims[i];
             }
             auto result = tile(input.array(), dims);
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(reduceAs(grad_output, inputs[0]));
+                inputs[0].addGrad(sumAs(grad_output, inputs[0]));
             };
             return Variable(result, {input}, grad_func);
         }
 
-        Variable reduceAs(const Variable &input, const Variable &reference)
+        Variable sumAs(const Variable &input, const Variable &reference)
         {
-            dim4 idims = input.array().dims();
-            dim4 rdims = reference.array().dims();
+            dim4 rdims = reference.dims();
+            dim4 idims = input.dims();
             auto result = input.array();
             for (int i = 0; i < 4; i++) {
                 if (idims[i] != rdims[i]) result = sum(result, i);
             }
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(expandAs(grad_output, inputs[0]));
+                inputs[0].addGrad(tileAs(grad_output, inputs[0]));
             };
             return Variable(result, {input}, grad_func);
         }

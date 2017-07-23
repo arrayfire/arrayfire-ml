@@ -51,7 +51,7 @@ namespace af
         {
             auto res = matmul(m_parameters[0], input);
             if (m_bias) {
-                res = res + expandAs(m_parameters[1], res);
+                res = res + tileAs(m_parameters[1], res);
             }
             return res;
         }
