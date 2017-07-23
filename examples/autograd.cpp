@@ -154,6 +154,19 @@ void test_sum()
     VERIFY(dx.array() - af::sum(y.array(), 1));
 }
 
+void test_mean()
+{
+    auto x = Variable(af::randu(5), true);
+    auto y = Variable(af::randu(5, 3, 2), true);
+    auto z = x * mean(y, {1,2});
+    auto dz = Variable(af::constant(1.0, 5), false);
+    z.backward(dz);
+    auto dy = y.grad();
+    auto dx = x.grad();
+    VERIFY(dy.array() - 6 * af::tile(x.array(), 1, 3, 2));
+    VERIFY(dx.array() - af::mean(af::mean(y.array(), 1), 2));
+}
+
 int main()
 {
     af::info();
@@ -168,5 +181,6 @@ int main()
     test_tanh();
     test_tile();
     test_sum();
+    test_mean();
     return 0;
 }

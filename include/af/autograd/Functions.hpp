@@ -7,7 +7,8 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 #pragma once
-#include <arrayfire.h>
+
+#include <vector>
 
 namespace af {
     namespace autograd {
@@ -63,6 +64,10 @@ namespace af {
         Variable transpose(const Variable &input);
         Variable tileAs(const Variable &input, const Variable &reference);
         Variable sumAs(const Variable &input, const Variable &reference);
+
+        Variable tile(const Variable &input, const std::vector<int> &repeats);
+        Variable sum(const Variable &input, const std::vector<int> &axes);
+        Variable mean(const Variable &input, const std::vector<int> &axes);
 
         Variable matmul(const Variable &lhs, const Variable &rhs);
         Variable matmulTN(const Variable &lhs, const Variable &rhs);
