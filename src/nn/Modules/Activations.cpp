@@ -61,7 +61,7 @@ namespace af
         Variable PReLU::forward(const Variable &input)
         {
             auto mask = input >= 0.0;
-            return (input * mask) + (input * !mask * expandAs(m_parameters[0],input));
+            return (input * mask) + (input * !mask * tileAs(m_parameters[0], input));
         }
 
         ELU::ELU(double alpha) :
@@ -85,6 +85,5 @@ namespace af
             auto mask = input >= m_threshold;
             return input * mask;
         }
-      
     }
 }

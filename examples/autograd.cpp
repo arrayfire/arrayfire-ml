@@ -128,11 +128,11 @@ void test_tanh()
     VERIFY(dx.array() - (1 + af::tanh(x.array())) * (1 - af::tanh(x.array())));
 }
 
-void test_expand()
+void test_tile()
 {
     auto x = Variable(af::randu(5), true);
     auto y = Variable(af::randu(5, 2), true);
-    auto z = y * expandAs(x, y);
+    auto z = y * tileAs(x, y);
     auto dz = Variable(af::constant(1.0, 5, 2), false);
     z.backward(dz);
     auto dy = y.grad();
@@ -141,11 +141,11 @@ void test_expand()
     VERIFY(dx.array() - af::sum(y.array(), 1));
 }
 
-void test_reduce()
+void test_sum()
 {
     auto x = Variable(af::randu(5), true);
     auto y = Variable(af::randu(5, 2), true);
-    auto z = x * reduceAs(y, x);
+    auto z = x * sumAs(y, x);
     auto dz = Variable(af::constant(1.0, 5), false);
     z.backward(dz);
     auto dy = y.grad();
@@ -166,7 +166,7 @@ int main()
     test_exp();
     test_sigmoid();
     test_tanh();
-    test_expand();
-    test_reduce();
+    test_tile();
+    test_sum();
     return 0;
 }
