@@ -60,6 +60,8 @@ namespace af {
 
             bool isGradAvailable() const;
 
+            af::dim4 dims() const;
+
             void zeroGrad();
 
             void setCalcGrad(bool calc_grad);
