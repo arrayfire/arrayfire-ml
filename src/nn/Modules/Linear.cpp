@@ -8,7 +8,7 @@
  ********************************************************/
 #include <af/autograd/Functions.hpp>
 
-#include <af/nn/Types.hpp>
+#include <af/nn/Init.hpp>
 #include <af/nn/Modules/Linear.hpp>
 
 namespace af
@@ -20,9 +20,9 @@ namespace af
         Linear::Linear(int input_size, int output_size, bool bias, float spread) :
             m_bias(bias)
         {
-            auto w = nn::weight(input_size, output_size, spread);
+            auto w = nn::lecunNormal(output_size, input_size);
             if (bias) {
-                auto b = nn::weight(1, output_size, spread);
+                auto b = nn::lecunNormal(output_size, 1);
                 setParams({w, b});
             } else {
                 setParams({w});

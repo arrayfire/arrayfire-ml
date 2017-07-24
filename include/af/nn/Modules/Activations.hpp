@@ -35,26 +35,26 @@ namespace af
         {
         public:
             ReLU();
-         
+
             autograd::Variable forward(const autograd::Variable &input);
         };
-      
+
         class LeakyReLU : public Module
         {
         private:
             double m_slope;
         public:
             LeakyReLU(double slope = 0.0);
-         
+
             autograd::Variable forward(const autograd::Variable &input);
         };
 
         class PReLU : public Module
         {
         public:
-            PReLU(int size, double spread = 1.0);
+            PReLU(int size, double value = 1.0);
             PReLU(const autograd::Variable &w);
-         
+
             autograd::Variable forward(const autograd::Variable &input);
         };
 
@@ -74,11 +74,11 @@ namespace af
             double m_threshold;
         public:
             ThresholdReLU(double threshold = 1.0);
-         
+
             autograd::Variable forward(const autograd::Variable &input);
         };
 
-      
+
 
     }
 }
