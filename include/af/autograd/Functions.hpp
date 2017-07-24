@@ -8,6 +8,7 @@
  ********************************************************/
 #pragma once
 
+#include <arrayfire.h>
 #include <vector>
 
 namespace af {
@@ -48,6 +49,7 @@ namespace af {
         Variable reciprocal(const Variable &input);
 
         Variable exp(const Variable &input);
+        Variable log(const Variable &input);
         Variable sin(const Variable &input);
         Variable cos(const Variable &input);
         Variable tanh(const Variable &input);
@@ -73,6 +75,9 @@ namespace af {
         Variable matmulTN(const Variable &lhs, const Variable &rhs);
         Variable matmulNT(const Variable &lhs, const Variable &rhs);
 
+        Variable abs(const Variable &input);
 
+        Variable flat(const Variable &input);
+        Variable moddims(const Variable &input, const dim4 &dims);
     }
 }
