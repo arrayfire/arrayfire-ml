@@ -8,6 +8,7 @@
  ********************************************************/
 
 #include <af/autograd.h>
+#include <af/nn.h>
 
 #define VERIFY(VAL) do {                                    \
         auto res = af::allTrue<bool>(af::abs(VAL) < 1E-5);  \

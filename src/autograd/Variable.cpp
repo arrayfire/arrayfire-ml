@@ -172,6 +172,12 @@ namespace af {
             }
         }
 
+        void Variable::backward(bool retain_grad_graph)
+        {
+            auto ones = Variable(af::constant(1, this->dims()), false);
+            this->backward(ones, retain_grad_graph);
+        }
+
         Variable::DAG_t Variable::build(const Variable &var)
         {
             Cache_t cache;

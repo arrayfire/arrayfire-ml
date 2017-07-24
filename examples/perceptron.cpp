@@ -39,7 +39,9 @@ int main()
     perceptron.add(nn::Linear(inputSize, outputSize));
     perceptron.add(nn::Sigmoid());
 
-    Variable result;
+    auto loss = nn::MeanSquaredError();
+
+    Variable result, l;
     for (int i = 0; i < 1000; i++) {
         for (int j = 0; j < numSamples; j++) {
             perceptron.train();
@@ -52,17 +54,15 @@ int main()
             result = perceptron.forward(nn::input(in_j));
 
             // Calculate loss
-            // TODO: Use loss function
-            af::array diff = out_j - result.array();
+            l = loss.forward(result, nn::noGrad(out_j));
 
             // Backward propagation
-            auto d_result = Variable(diff, false);
-            result.backward(d_result);
+            l.backward();
 
             // Update parameters
             // TODO: Should use optimizer
             for (auto &param : perceptron.parameters()) {
-                param.array() += lr * param.grad().array();
+                param.array() -= lr * param.grad().array();
                 param.array().eval();
             }
         }

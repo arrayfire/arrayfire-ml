@@ -15,6 +15,7 @@ target_sources(afml
   src/nn/Modules/Activations.cpp
   src/nn/Modules/Container.cpp
   src/nn/Modules/Linear.cpp
+  src/nn/Modules/Loss.cpp
   src/nn/Modules/Module.cpp
   src/nn/Init.cpp
   )

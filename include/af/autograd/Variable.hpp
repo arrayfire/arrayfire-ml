@@ -72,6 +72,7 @@ namespace af {
 
             void backward(const Variable &grad, bool retain_grad_graph = false);
 
+            void backward(bool retain_grad_graph = false);
 
         private:
             void evalGrad(bool retain_grad_graph = false);
