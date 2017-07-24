@@ -74,6 +74,8 @@ namespace af {
         Variable matmul(const Variable &lhs, const Variable &rhs);
         Variable matmulTN(const Variable &lhs, const Variable &rhs);
         Variable matmulNT(const Variable &lhs, const Variable &rhs);
+      
+        Variable conv2d(const Variable &input, const Variable &weights, int, int, int, int, int, int);
 
         Variable abs(const Variable &input);
 

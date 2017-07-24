@@ -414,5 +414,54 @@ namespace af {
             };
             return Variable(result, {input}, grad_func);
         }
+      
+	Variable conv2d(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            dim4 idims = input.array().dims();               //(x_i, y_i, c_i,  n)
+            dim4 pdims = weights.array().dims();      //(wx, wy, c_i, c_o)
+
+            int x_i = idims[0];
+            int y_i = idims[1];
+            int c_i = idims[2];
+            int n   = idims[3];
+
+            int c_o = pdims[3];
+
+            int x_o = (x_i + 2 * px - wx) / sx;
+            int y_o = (y_i + 2 * py - wy) / sy;
+            
+            dim4 odims = dim4(x_o, y_o, c_o, n); //(x_o, y_o, c_o, n)
+            
+
+            //Get windows from the layer input
+            auto windows = unwrap(input.array(), wx, wy, sx, sy, px, py);
+
+            //Transform lhs to do conv in 1 matmul
+            auto lhs = moddims(reorder(windows, 1, 0, 2, 3), wx * wy * c_i, n);
+            auto rhs = moddims(weights.array(), wx * wy * c_i);
+
+            //TODO: This loop can be replaced with a batched matmult as soon as
+            //that is added to arrayfire
+            
+            std::vector<array> out;
+            for(int i = 0; i < n; i++){
+                moddims(matmul(lhs(span, span, span, i), rhs), x_o, y_o, c_o);
+            }
+            out.push_back(matmul(lhs, rhs));
+
+            //TODO: Join elements of out together - each one is the result of a separate input image
+            //auto result = join(3, out)
+
+            auto result = out[0];
+            
+            /*
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(wrap(grad_output, inputs[0]));
+            };
+            */
+          
+          return Variable(result, false);
+        }
+
     }
 }
