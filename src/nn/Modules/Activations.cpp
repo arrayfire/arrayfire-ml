@@ -9,7 +9,7 @@
 
 #include <af/autograd/Functions.hpp>
 #include <af/nn/Modules/Activations.hpp>
-#include <af/nn/Types.hpp>
+#include <af/nn/Init.hpp>
 namespace af
 {
     namespace nn
@@ -47,9 +47,9 @@ namespace af
             return max(input, m_slope * input);
         }
 
-        PReLU::PReLU(int size, double spread)
+        PReLU::PReLU(int size, double value)
         {
-            auto w = nn::weight(size, 1, spread);
+            auto w = nn::constant(value, size, 1);
             setParams({w});
         }
 

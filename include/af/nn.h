@@ -10,4 +10,4 @@
 #pragma once
 
 #include <af/nn/Modules.hpp>
-#include <af/nn/Types.hpp>
+#include <af/nn/Init.hpp>

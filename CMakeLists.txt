@@ -16,7 +16,7 @@ target_sources(afml
   src/nn/Modules/Container.cpp
   src/nn/Modules/Linear.cpp
   src/nn/Modules/Module.cpp
-  src/nn/Types.cpp
+  src/nn/Init.cpp
   )
 
 target_include_directories(afml
