@@ -15,6 +15,8 @@ namespace af {
 
         autograd::Variable input(const af::array &arr);
 
+        autograd::Variable noGrad(const af::array &arr);
+
         autograd::Variable parameter(const af::array &arr);
 
         autograd::Variable uniform(int input_size, int output_size,

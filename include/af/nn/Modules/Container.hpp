@@ -41,8 +41,6 @@ namespace af
             ModulePtr get(int id);
 
             std::vector<ModulePtr> modules();
-
-            virtual autograd::Variable forward(const autograd::Variable &input) = 0;
         };
 
         class Sequential : public Container
@@ -51,7 +49,7 @@ namespace af
 
             Sequential();
 
-            virtual autograd::Variable forward(const autograd::Variable &input);
+            autograd::Variable forward(const autograd::Variable &input);
         };
     }
 }

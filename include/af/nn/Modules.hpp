@@ -12,3 +12,4 @@
 #include <af/nn/Modules/Linear.hpp>
 #include <af/nn/Modules/Container.hpp>
 #include <af/nn/Modules/Activations.hpp>
+#include <af/nn/Modules/Loss.hpp>

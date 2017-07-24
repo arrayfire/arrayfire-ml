@@ -21,6 +21,11 @@ namespace af {
             return Variable(arr, false);
         }
 
+        Variable noGrad(const af::array &arr)
+        {
+            return Variable(arr, false);
+        }
+
         Variable parameter(const af::array &arr)
         {
             return Variable(arr, true);
