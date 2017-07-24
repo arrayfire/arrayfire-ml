@@ -194,6 +194,15 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
+        Variable log(const Variable &input)
+        {
+            auto result = log(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(grad_output / inputs[0]);
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
         Variable sin(const Variable &input)
         {
             auto result = sin(input.array());
@@ -374,6 +383,36 @@ namespace af {
                 inputs[1].addGrad(matmulTN(grad_output, inputs[0]));
             };
             return Variable(result, {lhs, rhs}, grad_func);
+        }
+
+        Variable abs(const Variable &input)
+        {
+            auto result = af::abs(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                // af::sign returns signbit
+                // Convert it into -1, 1
+                auto sign = Variable(1 - 2 * af::sign(inputs[0].array()), false);
+                inputs[0].addGrad(sign * grad_output);
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable flat(const Variable &input)
+        {
+            auto result = af::flat(input.array());
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(moddims(grad_output, inputs[0].dims()));
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
+        Variable moddims(const Variable &input, const dim4 &dims)
+        {
+            auto result = af::moddims(input.array(), dims);
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(moddims(grad_output, inputs[0].dims()));
+            };
+            return Variable(result, {input}, grad_func);
         }
     }
 }
