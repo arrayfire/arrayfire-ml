@@ -27,9 +27,9 @@ namespace af
         public:
             Conv2D(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias = true, float spread = 0.05);
 
-            Conv2D(const autograd::Variable &w);
+            Conv2D(const autograd::Variable &w, int sx = 1, int sy = 1, int px = 0, int py = 0);
 
-            Conv2D(const autograd::Variable &w, const autograd::Variable &b);
+            Conv2D(const autograd::Variable &w, const autograd::Variable &b, int sx = 1, int sy = 1, int px = 0, int py = 0);
 
             autograd::Variable forward(const autograd::Variable &input);
         };

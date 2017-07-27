@@ -74,7 +74,12 @@ namespace af {
         Variable matmul(const Variable &lhs, const Variable &rhs);
         Variable matmulTN(const Variable &lhs, const Variable &rhs);
         Variable matmulNT(const Variable &lhs, const Variable &rhs);
-      
+
+        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py);
+        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py);
+
+        Variable moddims(const Variable &input, int d0, int d1=-1, int d2=-1, int d3=-1);
+        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3);
         Variable conv2d(const Variable &input, const Variable &weights, int, int, int, int, int, int);
 
         Variable abs(const Variable &input);
