@@ -333,70 +333,6 @@ namespace af {
             return Variable(result, {lhs, rhs}, grad_func);
         }
 
-        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py)
-        {
-            dim4 d = input.array().dims();
-            array res = unwrap(input.array(), wx, wy, sx, sy, px, py);
-            int params[] = {wx, wy, sx, sy, px, py, (int)d[0], (int)d[1]};
-            auto tmp = Variable(array(8, params), false);
-
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                int* t = inputs[1].array().host<int>();
-                inputs[0].addGrad(wrap(grad_output, t[6], t[7], t[0], t[1], t[2], t[3], t[4], t[5]));
-            };
-            return Variable(res, {input, tmp}, grad_func);
-        }
-
-        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py)
-        {
-            array res = wrap(input.array(), ox, oy, wx, wy, sx, sy, px, py);
-            int params[] = {wx, wy, sx, sy, px, py};
-            auto tmp = Variable(array(6, params), false);
-
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                int* t = inputs[1].array().host<int>();
-                inputs[0].addGrad(unwrap(grad_output, t[0], t[1], t[2], t[3], t[4], t[5]));
-            };
-            return Variable(res, {input, tmp}, grad_func);
-        }
-
-        Variable moddims(const Variable &input, int d0, int d1, int d2, int d3)
-        {
-
-            dim4 orig = input.array().dims();
-            if(d1 == -1) d1 = orig[1];
-            if(d2 == -1) d2 = orig[2];
-            if(d3 == -1) d3 = orig[3];
-            auto res = moddims(input.array(), d0, d1, d2, d3);
-
-            int params[] = {(int)orig[0], (int)orig[1], (int)orig[2], (int)orig[3]};
-            auto tmp = Variable(array(4, params), false);
-
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output){
-                int *p = inputs[1].array().host<int>();
-                inputs[0].addGrad(moddims(grad_output, p[0], p[1], p[2], p[3]));
-            };
-            return Variable(res, {input, tmp}, grad_func);
-        }
-
-        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3)
-        {
-            array res = reorder(input.array(), d0, d1, d2, d3);
-
-            int tmp[] = {d0, d1, d2, d3};
-            int tmp2[4];
-            for(int i = 0; i < 4; i++){
-                tmp2[tmp[i]] = i;
-            }
-            auto reverse = Variable(array(4, tmp2), false);
-
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output){
-                int *r = inputs[1].array().host<int>();
-                inputs[0].addGrad(reorder(grad_output, r[0], r[1], r[2], r[3]));
-            };
-            return Variable(res, {input, reverse}, grad_func);
-        }
-
         Variable conv2d(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py)
         {
             dim4 idims = input.array().dims();      // (x_i, y_i, c_i,  n  )
@@ -426,7 +362,7 @@ namespace af {
                 out.push_back(moddims(res , x_o, y_o, c_o, 1));
             }
 
-            //LOL @ C++ API
+            //LOL @ C++ API - need this loop to have arbitrary batch size
             array result = out[0];
             for(int i = 1; i < n; i+=3){
                 int rem = n - i;
@@ -443,11 +379,7 @@ namespace af {
                 }
             }
 
-            int tmp[] = {wx, wy, sx, sy, px, py, c_i, x_o, y_o};
-            auto params = Variable(array(9, tmp), false);
-
-            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                int* p = inputs[3].array().host<int>(); //unpack parameters
+            auto grad_func = [wx, wy, sx, sy, px, py, c_i, n](std::vector<Variable> &inputs, const Variable &grad_output) {
                 dim4 odims = grad_output.array().dims();
                 dim4 wdims = inputs[1].array().dims();
                 dim4 idims = inputs[0].array().dims();
@@ -460,14 +392,40 @@ namespace af {
                 //TODO: This doesn't work for n > 1
                 //TODO: Can these lines be shortened? - This seems like a large grad function - perhaps this
                 // could all be implemented in Conv2D::forward(). I had to implement the helper functions anyways
+                /*
+                std::vector<array> out;
+                for(int i = 0; i < n; i++){
+                auto a = matmulNT(grad_out_reshape(span, span, i), weights_reshape); //Problem is here - can't call () on Variable
+                auto adims = a.array().dims();
+                auto b = moddims(a, adims[0], wx*wy, c_i, adims[3]);
+                auto c = reorder(b, 1, 0, 2, 3);
+                out.push_pack(wrap(c, idims[0], idims[1], wx, wy, sx, sy, px, py));
+                }
+
+                array result = out[0];
+                for(int i = 1; i < n; i+=3){
+                    int rem = n - i;
+                    if(rem >= 3){
+                        result = join(3, result, out[i], out[i+1], out[i+2]);
+                    }else if(rem == 2){
+                        result = join(3, result, out[i], out[i+1]);
+                        break;
+                    }else if(rem == 1){
+                        result = join(3, result, out[i]);
+                        break;
+                    }else{
+                        break;
+                    }
+                }
+                */
                 auto a = matmulNT(grad_out_reshape, weights_reshape);
                 auto adims = a.array().dims();
-                auto b = moddims(a, adims[0], p[0]*p[1], p[6], adims[3]);
+                auto b = moddims(a, adims[0], wx*wy, c_i, adims[3]);
                 auto c = reorder(b, 1, 0, 2, 3);
-                inputs[0].addGrad(wrap(c, idims[0], idims[1], p[0], p[1], p[2], p[3], p[4], p[5]));
+                inputs[0].addGrad(wrap(c, idims[0], idims[1], wx, wy, sx, sy, px, py));
 
                 auto d = matmulTN(inputs[2],grad_out_reshape);
-                inputs[1].addGrad(moddims(d, p[0], p[1], p[6], d.array().dims()[1]));
+                inputs[1].addGrad(moddims(d, wx, wy, c_i, d.array().dims()[1]));
 
                 /*
                   for(int i = 0; i < odims[3]; i++){
@@ -476,9 +434,48 @@ namespace af {
                   inputs[1].addGrad(matmulTN(inputs[0], Variable(lhs(span, span, span, i), true)));
                   }
                 */
+
             };
-            return Variable(result, {input, weights, Variable(lhs, false), params}, grad_func);
+            return Variable(result, {input, weights, Variable(lhs, false)}, grad_func);
 
         }
+
+        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = unwrap(input.array(), wx, wy, sx, sy, px, py);
+            dim4 d = input.array().dims();
+            auto grad_func = [d, wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(wrap(grad_output, d[0], d[1], wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = wrap(input.array(), ox, oy, wx, wy, sx, sy, px, py);
+            auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(unwrap(grad_output, wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3)
+        {
+            array res = reorder(input.array(), d0, d1, d2, d3);
+
+            int tmp[] = {d0, d1, d2, d3};
+            int tmp2[4];
+            for(int i = 0; i < 4; i++){
+                tmp2[tmp[i]] = i;
+            }
+            auto reverse = Variable(array(4, tmp2), false);
+
+            auto grad_func = [tmp2](std::vector<Variable> &inputs, const Variable &grad_output){
+                inputs[0].addGrad(reorder(grad_output, tmp2[0], tmp2[1], tmp2[2], tmp2[3]));
+            };
+            return Variable(res, {input, reverse}, grad_func);
+        }
+
+
     }
 }
