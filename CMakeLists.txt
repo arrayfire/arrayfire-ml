@@ -18,6 +18,7 @@ target_sources(afml
   src/nn/Modules/Loss.cpp
   src/nn/Modules/Module.cpp
   src/nn/Init.cpp
+  src/nn/Modules/Conv2D.cpp
   )
 
 target_include_directories(afml
