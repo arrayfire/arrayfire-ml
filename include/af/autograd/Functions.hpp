@@ -79,5 +79,9 @@ namespace af {
 
         Variable flat(const Variable &input);
         Variable moddims(const Variable &input, const dim4 &dims);
+        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3);
+
+        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py);
+        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py);
     }
 }

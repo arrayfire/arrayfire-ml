@@ -414,5 +414,41 @@ namespace af {
             };
             return Variable(result, {input}, grad_func);
         }
+
+        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3)
+        {
+            array res = reorder(input.array(), d0, d1, d2, d3);
+
+            int tmp[] = {d0, d1, d2, d3};
+            int tmp2[4];
+            for(int i = 0; i < 4; i++){
+                tmp2[tmp[i]] = i;
+            }
+            auto reverse = Variable(array(4, tmp2), false);
+
+            auto grad_func = [tmp2](std::vector<Variable> &inputs, const Variable &grad_output){
+                inputs[0].addGrad(reorder(grad_output, tmp2[0], tmp2[1], tmp2[2], tmp2[3]));
+            };
+            return Variable(res, {input, reverse}, grad_func);
+        }
+
+        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = unwrap(input.array(), wx, wy, sx, sy, px, py);
+            auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                dim4 d = inputs[0].dims();
+                inputs[0].addGrad(wrap(grad_output, d[0], d[1], wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = wrap(input.array(), ox, oy, wx, wy, sx, sy, px, py);
+            auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(unwrap(grad_output, wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
     }
 }
