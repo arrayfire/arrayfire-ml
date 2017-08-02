@@ -51,10 +51,10 @@ int main()
             af::array out_j = out(af::span, j);
 
             // Forward propagation
-            result = perceptron.forward(nn::input(in_j));
+            result = perceptron(nn::input(in_j));
 
             // Calculate loss
-            l = loss.forward(result, nn::noGrad(out_j));
+            l = loss(result, nn::noGrad(out_j));
 
             // Backward propagation
             l.backward();
@@ -71,7 +71,7 @@ int main()
             perceptron.eval();
 
             // Forward propagation
-            result = perceptron.forward(nn::input(in));
+            result = perceptron(nn::input(in));
 
             // Calculate loss
             // TODO: Use loss function

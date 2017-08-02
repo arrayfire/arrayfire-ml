@@ -42,6 +42,8 @@ namespace af
             void eval();
 
             virtual autograd::Variable forward(const autograd::Variable &input) = 0;
+
+            autograd::Variable operator()(const autograd::Variable &input);
         };
     }
 }
