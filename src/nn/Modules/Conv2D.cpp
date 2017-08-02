@@ -42,7 +42,7 @@ namespace af
             m_bias(false),
             Module({w})
         {
-            dim4 pdims = w.array().dims();
+            dim4 pdims = w.dims();
             m_wx = pdims[0];
             m_wy = pdims[1];
         }
@@ -55,13 +55,10 @@ namespace af
             m_bias(true),
             Module({w, b})
         {
-            /*if (b.array().dims(0) != w.array().dims(0)) {
-                throw af::exception("nn:Linear: Dimension mismatch between weight and bias.");
-                }*/
-            if (b.array().dims(1) != 1) {
+            if (b.dims()[1] != 1) {
                 throw af::exception("nn::Linear: Bias must be a vector.");
             }
-            dim4 pdims = w.array().dims();
+            dim4 pdims = w.dims();
             m_wx = pdims[0];
             m_wy = pdims[1];
         }

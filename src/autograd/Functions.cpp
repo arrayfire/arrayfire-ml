@@ -424,12 +424,11 @@ namespace af {
             for(int i = 0; i < 4; i++){
                 tmp2[tmp[i]] = i;
             }
-            auto reverse = Variable(array(4, tmp2), false);
 
             auto grad_func = [tmp2](std::vector<Variable> &inputs, const Variable &grad_output){
                 inputs[0].addGrad(reorder(grad_output, tmp2[0], tmp2[1], tmp2[2], tmp2[3]));
             };
-            return Variable(res, {input, reverse}, grad_func);
+            return Variable(res, {input}, grad_func);
         }
 
         Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py)
