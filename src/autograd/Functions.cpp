@@ -545,14 +545,6 @@ namespace af {
                 auto d = matmulTN(inputs[2],grad_out_reshape);
                 inputs[1].addGrad(moddims(d, dim4(wx, wy, c_i, d.dims()[1])));
 
-                /*
-                  for(int i = 0; i < odims[3]; i++){
-                  inputs[0].addGrad(wrap(), p[0], p[1], p[2], p[3], p[4], p[5]);
-                  inputs[0].addGrad(wrap(matmulNT(Variable(lhs(span, span, span, i), false), p_tmp), p[0], p[1], p[2], p[3], p[4], p[5]));
-                  inputs[1].addGrad(matmulTN(inputs[0], Variable(lhs(span, span, span, i), true)));
-                  }
-                */
-
             };
             return Variable(result, {input, weights, Variable(lhs, false)}, grad_func);
 
