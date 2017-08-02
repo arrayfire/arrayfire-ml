@@ -8,7 +8,7 @@
  ********************************************************/
 #include <af/autograd/Functions.hpp>
 #include <af/nn/Init.hpp>
-#include <af/nn/Modules/Conv2D.hpp>
+#include <af/nn/Modules/Convolve2.hpp>
 //output will be ho x wo x no x n
 namespace af
 {
@@ -16,7 +16,7 @@ namespace af
     {
         using namespace autograd;
 
-        Conv2D::Conv2D(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias) :
+        Convolve2::Convolve2(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias) :
             m_wx(wx),
             m_wy(wy),
             m_sx(sx),
@@ -34,7 +34,7 @@ namespace af
             }
         }
 
-        Conv2D::Conv2D(const Variable &w, int sx, int sy, int px, int py) :
+        Convolve2::Convolve2(const Variable &w, int sx, int sy, int px, int py) :
             m_sx(sx),
             m_sy(sy),
             m_px(px),
@@ -47,7 +47,7 @@ namespace af
             m_wy = pdims[1];
         }
 
-        Conv2D::Conv2D(const Variable &w, const Variable &b, int sx, int sy, int px, int py) :
+        Convolve2::Convolve2(const Variable &w, const Variable &b, int sx, int sy, int px, int py) :
             m_sx(sx),
             m_sy(sy),
             m_px(px),
@@ -63,7 +63,7 @@ namespace af
             m_wy = pdims[1];
         }
 
-        Variable Conv2D::forward(const Variable &input)
+        Variable Convolve2::forward(const Variable &input)
         {
             auto res = conv2d(input, m_parameters[0], m_wx, m_wy, m_sx, m_sy, m_px, m_py);
             if (m_bias) {

@@ -13,4 +13,4 @@
 #include <af/nn/Modules/Container.hpp>
 #include <af/nn/Modules/Activations.hpp>
 #include <af/nn/Modules/Loss.hpp>
-#include <af/nn/Modules/Conv2D.hpp>
+#include <af/nn/Modules/Convolve2.hpp>

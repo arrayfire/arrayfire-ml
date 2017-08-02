@@ -16,7 +16,7 @@ target_sources(afml
   src/nn/Modules/Container.cpp
   src/nn/Modules/Linear.cpp
   src/nn/Modules/Loss.cpp
-  src/nn/Modules/Conv2D.cpp
+  src/nn/Modules/Convolve2.cpp
   src/nn/Modules/Module.cpp
   src/nn/Init.cpp
   )

@@ -14,7 +14,7 @@ namespace af
 {
     namespace nn
     {
-        class Conv2D : public Module
+        class Convolve2 : public Module
         {
         private:
             bool m_bias;
@@ -25,11 +25,11 @@ namespace af
             int m_px;
             int m_py;
         public:
-            Conv2D(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias = true);
+            Convolve2(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias = true);
 
-            Conv2D(const autograd::Variable &w, int sx = 1, int sy = 1, int px = 0, int py = 0);
+            Convolve2(const autograd::Variable &w, int sx = 1, int sy = 1, int px = 0, int py = 0);
 
-            Conv2D(const autograd::Variable &w, const autograd::Variable &b, int sx = 1, int sy = 1, int px = 0, int py = 0);
+            Convolve2(const autograd::Variable &w, const autograd::Variable &b, int sx = 1, int sy = 1, int px = 0, int py = 0);
 
             autograd::Variable forward(const autograd::Variable &input);
         };
