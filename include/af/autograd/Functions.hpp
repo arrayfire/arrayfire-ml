@@ -83,5 +83,7 @@ namespace af {
 
         Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py);
         Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py);
+
+        Variable conv2d(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py);
     }
 }
