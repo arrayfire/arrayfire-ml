@@ -9,8 +9,21 @@
 #pragma once
 
 #include <af/nn/Modules/Module.hpp>
-#include <af/nn/Modules/Linear.hpp>
-#include <af/nn/Modules/Container.hpp>
-#include <af/nn/Modules/Activations.hpp>
-#include <af/nn/Modules/Loss.hpp>
-#include <af/nn/Modules/Dropout.hpp>
+
+namespace af
+{
+    namespace nn
+    {
+        class Dropout : public Module
+        {
+        private:
+            autograd::Variable mask;
+        public:
+            Dropout(dim4 shape, double drop_ratio = .5);
+
+            Dropout(const autograd::Variable &m);
+
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+    }
+}
