@@ -21,6 +21,12 @@ namespace af
             throw af::exception("Loss module requires both inputs and targets");
         }
 
+        autograd::Variable Loss::operator()(const autograd::Variable &inputs,
+                                            const autograd::Variable &targets)
+        {
+            return this->forward(inputs, targets);
+        }
+
         autograd::Variable MeanSquaredError::forward(const autograd::Variable &inputs,
                                                      const autograd::Variable &targets)
         {

@@ -23,6 +23,9 @@ namespace af
                                                const autograd::Variable &targets) = 0;
 
             autograd::Variable forward(const autograd::Variable &inputs);
+
+            autograd::Variable operator()(const autograd::Variable &inputs,
+                                          const autograd::Variable &targets);
         };
 
         class MeanSquaredError : public Loss
