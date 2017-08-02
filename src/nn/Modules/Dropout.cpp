@@ -19,7 +19,7 @@ namespace af
 
         Dropout::Dropout(dim4 shape, double drop_ratio)
         {
-            mask = nn::lecunUniform(shape) > drop_ratio;
+            mask = nn::lecunUniform(shape, f32, false) > drop_ratio;
         }
 
         Dropout::Dropout(const Variable &m) :
