@@ -414,5 +414,142 @@ namespace af {
             };
             return Variable(result, {input}, grad_func);
         }
+
+        Variable reorder(const Variable &input, int d0, int d1, int d2, int d3)
+        {
+            array res = reorder(input.array(), d0, d1, d2, d3);
+
+            int tmp[] = {d0, d1, d2, d3};
+            int tmp2[4];
+            for(int i = 0; i < 4; i++){
+                tmp2[tmp[i]] = i;
+            }
+
+            auto grad_func = [tmp2](std::vector<Variable> &inputs, const Variable &grad_output){
+                inputs[0].addGrad(reorder(grad_output, tmp2[0], tmp2[1], tmp2[2], tmp2[3]));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable unwrap(const Variable &input, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = unwrap(input.array(), wx, wy, sx, sy, px, py);
+            auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                dim4 d = inputs[0].dims();
+                inputs[0].addGrad(wrap(grad_output, d[0], d[1], wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable wrap(const Variable &input, int ox, int oy, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            array res = wrap(input.array(), ox, oy, wx, wy, sx, sy, px, py);
+            auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                inputs[0].addGrad(unwrap(grad_output, wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable conv2d(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py)
+        {
+            dim4 idims = input.array().dims();      // (x_i, y_i, c_i,  n  )
+            dim4 wdims = weights.array().dims();    // (wx,  wy,  c_i,  c_o)
+
+            int x_i = idims[0];                     //size of x dim of input
+            int y_i = idims[1];                     //size of y dim of input
+            int c_i = idims[2];                     //number of input channels
+            int n   = idims[3];                     //batch size (1 for now)
+
+            int x_o = (x_i + 2 * px - wx) / sx + 1; //size of x dim of output
+            int y_o = (y_i + 2 * py - wy) / sy + 1; //size of x dim of output
+            int c_o = wdims[3];                     //number of output channels
+
+            array windows = unwrap(input.array(), wx, wy, sx, sy, px, py);
+
+            array lhs = moddims(
+                reorder(windows, 1, 0, 2, 3),
+                dim4(x_o * y_o, wx * wy * c_i, n, 1));
+            array rhs = moddims(weights.array(), dim4(wx * wy * c_i, c_o, 1, 1));
+
+            //TODO: This loop can be replaced with a batched matmult as soon as
+            //that is added to arrayfire
+            std::vector<array> out;
+            for(int i = 0; i < n; i++){
+                array res = matmul(lhs(span, span, i), rhs);
+                out.push_back(moddims(res , dim4(x_o, y_o, c_o, 1)));
+            }
+
+            //LOL @ C++ API - need this loop to have arbitrary batch size
+            array result = out[0];
+            for(int i = 1; i < n; i+=3){
+                int rem = n - i;
+                if(rem >= 3){
+                    result = join(3, result, out[i], out[i+1], out[i+2]);
+                }else if(rem == 2){
+                    result = join(3, result, out[i], out[i+1]);
+                    break;
+                }else if(rem == 1){
+                    result = join(3, result, out[i]);
+                    break;
+                }else{
+                    break;
+                }
+            }
+
+            auto grad_func = [wx, wy, sx, sy, px, py, c_i, n](std::vector<Variable> &inputs, const Variable &grad_output) {
+                dim4 odims = grad_output.array().dims();
+                dim4 wdims = inputs[1].array().dims();
+                dim4 idims = inputs[0].array().dims();
+
+                auto grad_out_reshape = moddims(grad_output, dim4(odims[0]*odims[1], odims[2], odims[3], 1));
+
+                auto weights_reshape = moddims(inputs[1], dim4(wdims[0]*wdims[1]*wdims[2], wdims[3], 1, 1));
+
+                //TODO: This really needs batched matmul...
+                //TODO: This doesn't work for n > 1
+                //TODO: Can these lines be shortened? - This seems like a large grad function - perhaps this
+                // could all be implemented in Conv2D::forward(). I had to implement the helper functions anyways
+                /*
+                std::vector<array> out;
+                for(int i = 0; i < n; i++){
+                auto a = matmulNT(grad_out_reshape(span, span, i), weights_reshape); //Problem is here - can't call () on Variable
+                auto adims = a.array().dims();
+                auto b = moddims(a, dim4(adims[0], wx*wy, c_i, adims[3]));
+                auto c = reorder(b, 1, 0, 2, 3);
+                out.push_pack(wrap(c, idims[0], idims[1], wx, wy, sx, sy, px, py));
+                }
+
+                array result = out[0];
+                for(int i = 1; i < n; i+=3){
+                    int rem = n - i;
+                    if(rem >= 3){
+                        result = join(3, result, out[i], out[i+1], out[i+2]);
+                    }else if(rem == 2){
+                        result = join(3, result, out[i], out[i+1]);
+                        break;
+                    }else if(rem == 1){
+                        result = join(3, result, out[i]);
+                        break;
+                    }else{
+                        break;
+                    }
+                }
+                */
+                auto a = matmulNT(grad_out_reshape, weights_reshape);
+                auto adims = a.array().dims();
+                auto b = moddims(a, dim4(adims[0], wx*wy, c_i, adims[3]));
+                auto c = reorder(b, 1, 0, 2, 3);
+                inputs[0].addGrad(wrap(c, idims[0], idims[1], wx, wy, sx, sy, px, py));
+
+                auto d = matmulTN(inputs[2],grad_out_reshape);
+                inputs[1].addGrad(moddims(d, dim4(wx, wy, c_i, d.dims()[1])));
+
+            };
+            return Variable(result, {input, weights, Variable(lhs, false)}, grad_func);
+
+        }
+
+
+
     }
 }
