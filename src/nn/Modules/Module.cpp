@@ -17,6 +17,7 @@ namespace af
         Module::Module() :
             m_parameters()
         {
+            m_train = false;
         }
 
         Module::Module(const std::vector<Variable> &parameters) :
@@ -34,6 +35,7 @@ namespace af
 
         void Module::train()
         {
+            m_train = true;
             for (auto &parameter : m_parameters) {
                 parameter.setCalcGrad(true);
             }
@@ -41,6 +43,7 @@ namespace af
 
         void Module::eval()
         {
+            m_train = false;
             for (auto &parameter : m_parameters) {
                 parameter.setCalcGrad(false);
             }

@@ -17,11 +17,9 @@ namespace af
         class Dropout : public Module
         {
         private:
-            autograd::Variable mask;
+            double m_ratio;
         public:
-            Dropout(dim4 shape, double drop_ratio = .5);
-
-            Dropout(const autograd::Variable &m);
+            Dropout(double drop_ratio = 0.5);
 
             autograd::Variable forward(const autograd::Variable &input);
         };

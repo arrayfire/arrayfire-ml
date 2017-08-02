@@ -17,19 +17,17 @@ namespace af
     {
         using namespace autograd;
 
-        Dropout::Dropout(dim4 shape, double drop_ratio)
-        {
-            mask = nn::lecunUniform(shape, f32, false) > drop_ratio;
-        }
-
-        Dropout::Dropout(const Variable &m) :
-            mask(m)
+        Dropout::Dropout(double drop_ratio) :
+            m_ratio(drop_ratio)
         {
         }
 
         Variable Dropout::forward(const Variable &input)
         {
-            return mask * input;
+            if(m_train)
+                return (uniform(input.dims(), 0.0, 1.0, f32, false) > m_ratio) * input;
+            else
+                return input;
         }
     }
 }

@@ -23,6 +23,8 @@ namespace af
         protected:
             std::vector<autograd::Variable> m_parameters;
 
+            bool m_train;
+
             Module();
 
             Module(const std::vector<autograd::Variable> &parameters);
