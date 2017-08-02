@@ -65,7 +65,7 @@ namespace af
 
         Variable Convolve2::forward(const Variable &input)
         {
-            auto res = conv2d(input, m_parameters[0], m_wx, m_wy, m_sx, m_sy, m_px, m_py);
+            auto res = convolve2(input, m_parameters[0], m_wx, m_wy, m_sx, m_sy, m_px, m_py);
             if (m_bias) {
                 res = res + tileAs(m_parameters[1], res);
             }

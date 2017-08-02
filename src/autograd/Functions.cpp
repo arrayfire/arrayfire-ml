@@ -450,7 +450,7 @@ namespace af {
             return Variable(res, {input}, grad_func);
         }
 
-        Variable conv2d(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py)
+        Variable convolve2(const Variable &input, const Variable &weights, int wx, int wy, int sx, int sy, int px, int py)
         {
             dim4 idims = input.array().dims();      // (x_i, y_i, c_i,  n  )
             dim4 wdims = weights.array().dims();    // (wx,  wy,  c_i,  c_o)
