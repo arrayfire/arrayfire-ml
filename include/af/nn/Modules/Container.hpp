@@ -8,9 +8,10 @@
  ********************************************************/
 #pragma once
 
-#include <memory>
 #include <af/autograd/Variable.hpp>
 #include <af/nn/Modules/Module.hpp>
+
+#include <memory>
 
 namespace af
 {

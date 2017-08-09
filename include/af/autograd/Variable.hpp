@@ -9,13 +9,13 @@
 
 #pragma once
 
+#include <arrayfire.h>
+
 #include <cstddef>
 #include <functional>
 #include <memory>
 #include <vector>
 #include <unordered_map>
-
-#include <arrayfire.h>
 
 namespace af {
     namespace autograd {
@@ -61,6 +61,8 @@ namespace af {
             bool isGradAvailable() const;
 
             af::dim4 dims() const;
+
+            af::dtype type() const;
 
             void zeroGrad();
 
