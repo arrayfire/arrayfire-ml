@@ -8,10 +8,10 @@
  ********************************************************/
 #pragma once
 
+#include <af/autograd/Variable.hpp>
+
 #include <string>
 #include <vector>
-
-#include <af/autograd/Variable.hpp>
 
 namespace af
 {

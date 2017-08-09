@@ -107,6 +107,11 @@ namespace af {
             return m_shared->m_data.dims();
         }
 
+        af::dtype Variable::type() const
+        {
+            return m_shared->m_data.type();
+        }
+
         void Variable::zeroGrad()
         {
             m_shared->m_grads.clear();
@@ -144,14 +149,7 @@ namespace af {
                 m_shared->m_grads.resize(1);
             }
 
-            // Remove the graph if not needed
-            if (!retain_grad_graph) {
-                // This can be done by extracting af::array and ignoring everything else
-                auto grad_data = grad.array();
-                // Since there's no graph leading this, set calc_grad to false
-                grad = Variable(grad_data, false);
-            }
-
+            grad.setCalcGrad(retain_grad_graph);
             m_shared->m_grads[0] = grad;
         }
 
