@@ -54,13 +54,6 @@ namespace af
             return m_parameters;
         }
 
-        void Module::zeroGrad()
-        {
-            for (auto &parameter : m_parameters) {
-                parameter.zeroGrad();
-            }
-        }
-
         Variable Module::operator()(const Variable &input)
         {
             return this->forward(input);

@@ -35,8 +35,6 @@ namespace af
 
             std::vector<autograd::Variable> parameters();
 
-            void zeroGrad();
-
             void train();
 
             void eval();
