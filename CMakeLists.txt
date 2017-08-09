@@ -19,6 +19,7 @@ target_sources(afml
   src/nn/Modules/Module.cpp
   src/nn/Modules/Dropout.cpp
   src/nn/Init.cpp
+  src/optim/Optimizers.cpp
   )
 
 target_include_directories(afml
