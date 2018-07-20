@@ -24,21 +24,14 @@ target_sources(afml
 
 target_include_directories(afml
   PUBLIC
-  ${ArrayFire_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  )
+  ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(afml
-  PUBLIC
-  af
-  )
+target_link_libraries(afml PUBLIC ArrayFire::af)
 
 set_target_properties(afml
   PROPERTIES
   VERSION "${ArrayFireML_VERSION}"
   SOVERSION "${ArrayFireML_VERSION_MAJOR}"
-  CXX_STANDARD 11
-  )
-
+  CXX_STANDARD 11)
 
 add_subdirectory(examples)
