@@ -35,3 +35,9 @@ set_target_properties(afml
   CXX_STANDARD 11)
 
 add_subdirectory(examples)
+
+option(PACKAGE_TESTS "Build tests" ON)
+    if(PACKAGE_TESTS)
+        enable_testing()
+        add_subdirectory(tests)
+    endif()

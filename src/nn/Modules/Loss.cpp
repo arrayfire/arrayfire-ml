@@ -46,7 +46,7 @@ namespace af
         binaryCrossEntropy(const autograd::Variable &inputs,
                            const autograd::Variable &targets)
         {
-            targets * inputs + (1 - targets) * (1 - inputs);
+            return targets * inputs + (1 - targets) * (1 - inputs);
         }
 
         autograd::Variable BinaryCrossEntropyLoss::forward(const autograd::Variable &inputs,
@@ -60,6 +60,26 @@ namespace af
                                                            const autograd::Variable &weights)
         {
             return mean(flat(weights * binaryCrossEntropy(inputs, targets)), {0});
+        }
+
+        static autograd::Variable
+        CrossEntropy(const autograd::Variable &inputs,
+                     const autograd::Variable &targets)
+        {
+            return targets * inputs + (1 - targets) * (1 - inputs);
+        }
+
+        autograd::Variable CrossEntropyLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets)
+        {
+            return mean(flat(CrossEntropy(inputs, targets)), {0});
+        }
+
+        autograd::Variable CrossEntropyLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets,
+                                                     const autograd::Variable &weights)
+        {
+            return mean(flat(weights * CrossEntropy(inputs, targets)), {0});
         }
     }
 }
