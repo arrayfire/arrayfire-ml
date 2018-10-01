@@ -44,6 +44,8 @@ namespace af {
         Variable operator <=(const Variable &lhs, const double &rhs);
 
         Variable operator !(const Variable &input);
+        Variable select_index(const Variable &input, const Variable &idx);
+        Variable set_index(const Variable &input, const Variable &idx, const Variable &vals);
 
         Variable negate(const Variable &input);
         Variable reciprocal(const Variable &input);
@@ -54,6 +56,7 @@ namespace af {
         Variable cos(const Variable &input);
         Variable tanh(const Variable &input);
         Variable sigmoid(const Variable &input);
+        Variable softmax(const Variable &input);
 
         Variable max(const Variable &lhs, const Variable &rhs);
         Variable max(const Variable &lhs, const double &rhs);
