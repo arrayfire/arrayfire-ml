@@ -59,9 +59,36 @@ namespace af
                                        const autograd::Variable &weights);
         };
 
+        class CrossEntropyLoss : public Loss
+        {
+        public:
+            CrossEntropyLoss() {}
+
+            autograd::Variable forward(const autograd::Variable &inputs,
+                                       const autograd::Variable &targets);
+
+            autograd::Variable forward(const autograd::Variable &inputs,
+                                       const autograd::Variable &targets,
+                                       const autograd::Variable &weights);
+        };
+
+        class MultiMarginLoss : public Loss
+        {
+        public:
+            MultiMarginLoss() {}
+
+            autograd::Variable forward(const autograd::Variable &inputs,
+                                       const autograd::Variable &targets);
+
+            autograd::Variable forward(const autograd::Variable &inputs,
+                                       const autograd::Variable &targets,
+                                       const autograd::Variable &weights);
+        };
+
         typedef MeanSquaredError MSE;
         typedef MeanAbsoluteError MAE;
         typedef MeanAbsoluteError L1Loss;
         typedef BinaryCrossEntropyLoss BCELoss;
+        typedef CrossEntropyLoss CELoss;
     }
 }
