@@ -164,12 +164,12 @@ TEST(Autograd, Softmax)
 }
 */
 
-TEST(Autograd, set_index)
+TEST(Autograd, assign)
 {
     auto x   = Variable(af::range(5) + 0.5, true);
     auto idx = Variable(af::range(2) + 1, false);
 
-    auto y = set_index(x, idx, Variable(af::constant(-2.0, idx.dims()), false));
+    auto y = assign(x, idx, Variable(af::constant(-2.0, idx.dims()), false));
     auto z = sum(2*y, {0});
     z.backward();
 
@@ -180,12 +180,12 @@ TEST(Autograd, set_index)
     EXPECT_TRUE(allTrue<bool>(abs(diff) < 1E-5));
 }
 
-TEST(Autograd, select_index)
+TEST(Autograd, lookup)
 {
     auto x   = Variable(af::randu(5), true);
     auto idx = Variable(af::range(2) + 1, false);
 
-    auto y = select_index(x, idx);
+    auto y = lookup(x, idx);
     auto z = sum(2*y, {0});
     z.backward();
 

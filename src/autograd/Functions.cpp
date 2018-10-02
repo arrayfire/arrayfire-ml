@@ -117,33 +117,31 @@ namespace af {
             return Variable(result, false);
         }
 
-        Variable select_index(const Variable &input, const Variable &idx)
+        Variable lookup(const Variable &input, const Variable &idx)
         {
             af::array result = input.array()(idx.array());
-            af::array mask   = af::constant(0, input.dims());
-            mask(idx.array()) = 1;
 
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                auto grad = inputs[2].array();
-                auto grad_mask = af::where(grad);
-                grad(grad_mask) *= grad_output.array();
+                af::array grad = af::constant(0, inputs[0].dims());
+                grad(inputs[1].array()) = grad_output.array();
 
                 inputs[0].addGrad(Variable(grad, false));
             };
-            return Variable(result, {input, idx, Variable(mask, false)}, grad_func);
+            return Variable(result, {input, idx}, grad_func);
         }
 
-        Variable set_index(const Variable &input, const Variable &idx, const Variable &vals)
+        Variable assign(const Variable &input, const Variable &idx, const Variable &vals)
         {
             af::array result = input.array();
             result(idx.array()) = vals.array();
-            af::array mask   = af::constant(1, input.dims(), s32);
-            mask(idx.array()) = 0;
 
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
-                inputs[0].addGrad(inputs[3] * grad_output);
+                af::array mask = af::constant(1, inputs[0].dims(), s32);
+                mask(inputs[1].array()) = 0;
+
+                inputs[0].addGrad(Variable(mask, false) * grad_output);
             };
-            return Variable(result, {input, idx, vals, Variable(mask, false)}, grad_func);
+            return Variable(result, {input, idx, vals}, grad_func);
         }
 
         Variable max(const Variable &lhs, const Variable &rhs)

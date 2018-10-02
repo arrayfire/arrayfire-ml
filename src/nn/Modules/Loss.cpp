@@ -70,9 +70,9 @@ namespace af
             auto correct_idxs  = (range(targets.dims()[0]) + inputs.dims()[0] * targets.array()).as(s32);
 
             auto exps = exp(inputs);
-            auto softmaxScores = exps / tile(sum(exps, {1}), { 1, exps.dims()[1] });
+            auto softmaxScores = exps / tile(sum(exps, {1}), { 1, (int)exps.dims()[1] });
 
-            Variable correct_scores = select_index(softmaxScores, Variable(correct_idxs, false));
+            Variable correct_scores = lookup(softmaxScores, Variable(correct_idxs, false));
 
             auto losses = -1 * log(correct_scores);
             return losses;
@@ -96,13 +96,13 @@ namespace af
                 const autograd::Variable &targets)
         {
             auto correct_idxs   = (range(targets.dims()[0]) + inputs.dims()[0] * targets.array()).as(s32);
-            Variable correct_scores = select_index(inputs, Variable(correct_idxs, false));
+            Variable correct_scores = lookup(inputs, Variable(correct_idxs, false));
 
             auto scores = inputs - tile(correct_scores, { 1, (int)inputs.dims()[1] } );
             const float margin = 1.f;
             auto losses = max(scores + margin, 0); //gives different results than max(0, scores + margin), "intended" behaviour
             //zero out correct classes, should not affect loss
-            losses = set_index(losses, correct_scores, Variable(af::constant(0, correct_scores.dims()[0]), false));
+            losses = assign(losses, correct_scores, Variable(af::constant(0, correct_scores.dims()[0]), false));
             losses = sum(losses, {1}) / inputs.dims()[1];
             return losses;
         }

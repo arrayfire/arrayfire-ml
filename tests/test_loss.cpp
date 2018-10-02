@@ -87,9 +87,6 @@ TEST(Loss, CELoss)
     auto l = loss(x, y);
     l.backward();
 
-    af_print(l.array())
-    af_print(x.grad().array())
-
     float h_x[] = { 0.0117,  0.0317, -0.9139,  0.2341,  0.6364 };
     af::array expected_grad(1, 5, h_x);
 
