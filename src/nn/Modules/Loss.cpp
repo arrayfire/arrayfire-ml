@@ -40,13 +40,14 @@ namespace af
         {
             auto df = inputs - targets;
             auto res = mean(flat(abs(df)), {0});
+            return res;
         }
 
         static autograd::Variable
         binaryCrossEntropy(const autograd::Variable &inputs,
                            const autograd::Variable &targets)
         {
-            targets * inputs + (1 - targets) * (1 - inputs);
+            return -1 * (targets * log(inputs) + (1 - targets) * log(1 - inputs));
         }
 
         autograd::Variable BinaryCrossEntropyLoss::forward(const autograd::Variable &inputs,
@@ -60,6 +61,63 @@ namespace af
                                                            const autograd::Variable &weights)
         {
             return mean(flat(weights * binaryCrossEntropy(inputs, targets)), {0});
+        }
+
+        static autograd::Variable
+        CrossEntropy(const autograd::Variable &inputs,
+                     const autograd::Variable &targets)
+        {
+            auto correct_idxs  = (range(targets.dims()[0]) + inputs.dims()[0] * targets.array()).as(s32);
+
+            auto exps = exp(inputs);
+            auto softmaxScores = exps / tile(sum(exps, {1}), { 1, (int)exps.dims()[1] });
+
+            Variable correct_scores = lookup(softmaxScores, Variable(correct_idxs, false));
+
+            auto losses = -1 * log(correct_scores);
+            return losses;
+        }
+
+        autograd::Variable CrossEntropyLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets)
+        {
+            return mean(flat(CrossEntropy(inputs, targets)), {0});
+        }
+
+        autograd::Variable CrossEntropyLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets,
+                                                     const autograd::Variable &weights)
+        {
+            return mean(flat(weights * CrossEntropy(inputs, targets)), {0});
+        }
+
+        static autograd::Variable
+        MarginLoss(const autograd::Variable &inputs,
+                const autograd::Variable &targets)
+        {
+            auto correct_idxs   = (range(targets.dims()[0]) + inputs.dims()[0] * targets.array()).as(s32);
+            Variable correct_scores = lookup(inputs, Variable(correct_idxs, false));
+
+            auto scores = inputs - tile(correct_scores, { 1, (int)inputs.dims()[1] } );
+            const float margin = 1.f;
+            auto losses = max(scores + margin, 0); //gives different results than max(0, scores + margin), "intended" behaviour
+            //zero out correct classes, should not affect loss
+            losses = assign(losses, correct_scores, Variable(af::constant(0, correct_scores.dims()[0]), false));
+            losses = sum(losses, {1}) / inputs.dims()[1];
+            return losses;
+        }
+
+        autograd::Variable MultiMarginLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets)
+        {
+            return mean(flat(MarginLoss(inputs, targets)), {0});
+        }
+
+        autograd::Variable MultiMarginLoss::forward(const autograd::Variable &inputs,
+                                                     const autograd::Variable &targets,
+                                                     const autograd::Variable &weights)
+        {
+            return mean(flat(weights * MarginLoss(inputs, targets)), {0});
         }
     }
 }

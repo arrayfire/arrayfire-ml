@@ -117,6 +117,33 @@ namespace af {
             return Variable(result, false);
         }
 
+        Variable lookup(const Variable &input, const Variable &idx)
+        {
+            af::array result = input.array()(idx.array());
+
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                af::array grad = af::constant(0, inputs[0].dims());
+                grad(inputs[1].array()) = grad_output.array();
+
+                inputs[0].addGrad(Variable(grad, false));
+            };
+            return Variable(result, {input, idx}, grad_func);
+        }
+
+        Variable assign(const Variable &input, const Variable &idx, const Variable &vals)
+        {
+            af::array result = input.array();
+            result(idx.array()) = vals.array();
+
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                af::array mask = af::constant(1, inputs[0].dims(), s32);
+                mask(inputs[1].array()) = 0;
+
+                inputs[0].addGrad(Variable(mask, false) * grad_output);
+            };
+            return Variable(result, {input, idx, vals}, grad_func);
+        }
+
         Variable max(const Variable &lhs, const Variable &rhs)
         {
             auto mask = lhs > rhs;
@@ -241,6 +268,24 @@ namespace af {
             return Variable(result, {input}, grad_func);
         }
 
+        Variable softmax(const Variable &input)
+        {
+            //todo: add axis to apply?
+            auto exps = exp(input.array());
+            auto result = exps / tile(sum(exps, 0), exps.dims(0));
+            auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
+                auto exps = exp(inputs[0]);
+                auto tmp = exps / tileAs(sum(exps, {0}), exps);
+
+                auto ps_j = tile(tmp, { 1, (int)tmp.dims()[0] } );
+                auto ps_i = transpose(tile(tmp, {1,(int)tmp.dims()[0] } ));
+                Variable I(identity((int)tmp.dims()[0], (int)tmp.dims()[0]), false);
+                auto jac = (sum(ps_i * (I - ps_j), { 1 }));
+                inputs[0].addGrad(grad_output * jac);
+            };
+            return Variable(result, {input}, grad_func);
+        }
+
         Variable transpose(const Variable &input)
         {
             auto result = transpose(input.array());
@@ -281,7 +326,7 @@ namespace af {
 
         Variable tile(const Variable &input, const std::vector<int> &repeats)
         {
-            dim4 dims;
+            dim4 dims(0);
             for (size_t i = 0; i < repeats.size(); i++) {
                 dims[i] = repeats[i];
             }
